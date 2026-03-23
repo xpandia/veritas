@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Veritas — Justice. Automated. For Everyone.</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --charcoal: #1a1a2e;
+  --charcoal-light: #24243e;
+  --blue: #0066ff;
+  --blue-glow: rgba(0, 102, 255, 0.3);
+  --white: #ffffff;
+  --gray: #8892b0;
+  --light-gray: #ccd6f6;
+}
+
+html, body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--charcoal);
+  color: var(--white);
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Progress Bar */
+#progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: var(--blue);
+  z-index: 1000;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 12px var(--blue-glow);
+}
+
+/* Slide Counter */
+#slide-counter {
+  position: fixed;
+  bottom: 28px;
+  right: 36px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--gray);
+  z-index: 100;
+  letter-spacing: 0.5px;
+}
+
+/* Navigation Dots */
+#nav-dots {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 100;
+}
+.nav-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.nav-dot.active {
+  background: var(--blue);
+  box-shadow: 0 0 8px var(--blue-glow);
+  transform: scale(1.3);
+}
+
+/* Help hint */
+#help-hint {
+  position: fixed;
+  bottom: 28px;
+  left: 36px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.25);
+  z-index: 100;
+  letter-spacing: 0.3px;
+}
+
+/* Slides Container */
+#deck {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.slide {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 80px;
+  opacity: 0;
+  transform: translateX(60px);
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+  text-align: center;
+}
+.slide.active {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+.slide.exit-left {
+  opacity: 0;
+  transform: translateX(-60px);
+}
+
+/* Typography */
+.slide h1 {
+  font-size: clamp(48px, 6vw, 80px);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -2px;
+  margin-bottom: 24px;
+}
+.slide h2 {
+  font-size: clamp(32px, 4vw, 56px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -1.5px;
+  margin-bottom: 20px;
+}
+.slide h3 {
+  font-size: clamp(20px, 2.5vw, 32px);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.5px;
+  margin-bottom: 16px;
+}
+.slide p {
+  font-size: clamp(16px, 1.6vw, 22px);
+  font-weight: 300;
+  line-height: 1.6;
+  color: var(--light-gray);
+  max-width: 780px;
+}
+.slide .subtitle {
+  font-size: clamp(18px, 2vw, 28px);
+  font-weight: 400;
+  color: var(--gray);
+  margin-bottom: 12px;
+}
+
+/* Blue accent */
+.blue { color: var(--blue); }
+.blue-glow {
+  color: var(--blue);
+  text-shadow: 0 0 40px var(--blue-glow);
+}
+
+/* Fade-in children animation */
+.slide.active .fade-up {
+  animation: fadeUp 0.7s ease forwards;
+}
+.fade-up {
+  opacity: 0;
+  transform: translateY(20px);
+}
+.fade-up:nth-child(1) { animation-delay: 0.1s; }
+.fade-up:nth-child(2) { animation-delay: 0.25s; }
+.fade-up:nth-child(3) { animation-delay: 0.4s; }
+.fade-up:nth-child(4) { animation-delay: 0.55s; }
+.fade-up:nth-child(5) { animation-delay: 0.7s; }
+.fade-up:nth-child(6) { animation-delay: 0.85s; }
+
+@keyframes fadeUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Stat blocks */
+.stat-row {
+  display: flex;
+  gap: 48px;
+  margin-top: 40px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.stat-block {
+  text-align: center;
+}
+.stat-number {
+  font-size: clamp(40px, 5vw, 72px);
+  font-weight: 800;
+  color: var(--blue);
+  line-height: 1;
+  letter-spacing: -2px;
+}
+.stat-label {
+  font-size: clamp(12px, 1.2vw, 16px);
+  color: var(--gray);
+  margin-top: 8px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+/* Comparison Table */
+.compare-table {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  margin-top: 40px;
+  width: 100%;
+  max-width: 900px;
+  border-radius: 16px;
+  overflow: hidden;
+}
+.compare-col {
+  padding: 40px 36px;
+  text-align: center;
+}
+.compare-col.old {
+  background: rgba(255, 60, 60, 0.08);
+  border: 1px solid rgba(255, 60, 60, 0.15);
+}
+.compare-col.new {
+  background: rgba(0, 102, 255, 0.08);
+  border: 1px solid rgba(0, 102, 255, 0.2);
+}
+.compare-col .col-title {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: 600;
+  margin-bottom: 28px;
+}
+.compare-col.old .col-title { color: #ff6b6b; }
+.compare-col.new .col-title { color: var(--blue); }
+.compare-item {
+  margin-bottom: 24px;
+}
+.compare-item:last-child { margin-bottom: 0; }
+.compare-item .val {
+  font-size: clamp(28px, 3.5vw, 44px);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -1px;
+}
+.compare-col.old .val { color: #ff6b6b; }
+.compare-col.new .val { color: var(--blue); }
+.compare-item .desc {
+  font-size: 13px;
+  color: var(--gray);
+  margin-top: 4px;
+  font-weight: 400;
+}
+
+/* Steps */
+.steps {
+  display: flex;
+  gap: 40px;
+  margin-top: 40px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.step {
+  flex: 1;
+  min-width: 220px;
+  max-width: 300px;
+  padding: 32px 24px;
+  background: var(--charcoal-light);
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.06);
+  text-align: center;
+}
+.step-num {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--blue);
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  margin-bottom: 12px;
+}
+.step-title {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+.step-desc {
+  font-size: 14px;
+  color: var(--gray);
+  line-height: 1.6;
+}
+
+/* TAM/SAM/SOM concentric */
+.tam-container {
+  position: relative;
+  width: clamp(320px, 40vw, 480px);
+  height: clamp(320px, 40vw, 480px);
+  margin: 36px auto 0;
+}
+.tam-circle {
+  position: absolute;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+.tam-circle.tam {
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 102, 255, 0.06);
+  border: 1.5px solid rgba(0, 102, 255, 0.2);
+  top: 0; left: 0;
+}
+.tam-circle.sam {
+  width: 65%;
+  height: 65%;
+  background: rgba(0, 102, 255, 0.1);
+  border: 1.5px solid rgba(0, 102, 255, 0.3);
+  top: 17.5%; left: 17.5%;
+}
+.tam-circle.som {
+  width: 35%;
+  height: 35%;
+  background: rgba(0, 102, 255, 0.2);
+  border: 1.5px solid rgba(0, 102, 255, 0.5);
+  top: 32.5%; left: 32.5%;
+}
+.tam-circle .circle-val {
+  font-size: clamp(18px, 2.5vw, 30px);
+  font-weight: 800;
+  color: var(--white);
+}
+.tam-circle .circle-label {
+  font-size: clamp(10px, 1vw, 13px);
+  font-weight: 600;
+  color: var(--blue);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-top: 4px;
+}
+.tam-circle.tam .circle-val,
+.tam-circle.tam .circle-label {
+  position: absolute;
+  top: 10%;
+}
+.tam-circle.tam .circle-label {
+  top: calc(10% + 34px);
+}
+
+/* Timeline / Roadmap */
+.roadmap {
+  display: flex;
+  gap: 24px;
+  margin-top: 36px;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+  max-width: 1000px;
+}
+.roadmap-item {
+  flex: 1;
+  min-width: 200px;
+  max-width: 240px;
+  padding: 28px 20px;
+  background: var(--charcoal-light);
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.06);
+  text-align: left;
+  position: relative;
+}
+.roadmap-item::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  background: var(--blue);
+  border-radius: 50%;
+  position: absolute;
+  top: -4px;
+  left: 24px;
+  box-shadow: 0 0 10px var(--blue-glow);
+}
+.roadmap-phase {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: 700;
+  color: var(--blue);
+  margin-bottom: 8px;
+}
+.roadmap-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.roadmap-desc {
+  font-size: 13px;
+  color: var(--gray);
+  line-height: 1.5;
+}
+
+/* Competitive grid */
+.comp-grid {
+  display: grid;
+  grid-template-columns: 1.2fr repeat(4, 1fr);
+  gap: 1px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-top: 32px;
+  width: 100%;
+  max-width: 960px;
+  font-size: clamp(11px, 1.1vw, 14px);
+}
+.comp-cell {
+  padding: 14px 12px;
+  background: var(--charcoal);
+  text-align: center;
+  font-weight: 400;
+  color: var(--gray);
+}
+.comp-cell.header {
+  font-weight: 700;
+  color: var(--white);
+  font-size: clamp(11px, 1vw, 13px);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: var(--charcoal-light);
+}
+.comp-cell.row-label {
+  text-align: left;
+  font-weight: 600;
+  color: var(--light-gray);
+}
+.comp-cell.highlight {
+  color: var(--blue);
+  font-weight: 700;
+  background: rgba(0, 102, 255, 0.05);
+}
+
+/* Business model cards */
+.bm-cards {
+  display: flex;
+  gap: 24px;
+  margin-top: 32px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.bm-card {
+  padding: 28px 24px;
+  background: var(--charcoal-light);
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.06);
+  text-align: center;
+  min-width: 160px;
+  max-width: 200px;
+}
+.bm-card .bm-val {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--blue);
+  margin-bottom: 6px;
+}
+.bm-card .bm-label {
+  font-size: 12px;
+  color: var(--gray);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 500;
+}
+
+/* Speaker Notes Panel */
+#notes-panel {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  max-height: 30vh;
+  background: rgba(0, 0, 0, 0.92);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding: 24px 40px;
+  z-index: 200;
+  overflow-y: auto;
+  font-size: 15px;
+  color: var(--light-gray);
+  line-height: 1.7;
+}
+#notes-panel.visible {
+  display: block;
+}
+
+/* Decorative background elements */
+.bg-glow {
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--blue-glow) 0%, transparent 70%);
+  opacity: 0.15;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Pulsing dot for live demo */
+.pulse-dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #00ff88;
+  margin-right: 8px;
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.5); }
+  50% { box-shadow: 0 0 0 12px rgba(0, 255, 136, 0); }
+}
+
+/* Quote styling */
+.quote {
+  font-size: clamp(24px, 3vw, 42px);
+  font-weight: 300;
+  font-style: italic;
+  color: var(--light-gray);
+  max-width: 800px;
+  line-height: 1.4;
+  position: relative;
+  padding-left: 24px;
+  border-left: 3px solid var(--blue);
+  text-align: left;
+}
+
+/* Logo / brand mark */
+.brand-mark {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  color: var(--blue);
+  margin-bottom: 32px;
+}
+
+/* Tagline */
+.tagline {
+  font-size: clamp(14px, 1.5vw, 20px);
+  font-weight: 500;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--gray);
+}
+
+/* Why now pills */
+.why-now-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 32px;
+  max-width: 700px;
+  text-align: left;
+}
+.why-now-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 16px 20px;
+  background: var(--charcoal-light);
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+.why-now-num {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--blue);
+  flex-shrink: 0;
+  width: 24px;
+}
+.why-now-text {
+  font-size: clamp(14px, 1.3vw, 17px);
+  color: var(--light-gray);
+  line-height: 1.5;
+  font-weight: 400;
+}
+.why-now-text strong {
+  color: var(--white);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .slide { padding: 40px 24px; }
+  .compare-table { grid-template-columns: 1fr; }
+  .stat-row { gap: 24px; }
+  .steps { flex-direction: column; align-items: center; }
+  .roadmap { flex-direction: column; align-items: center; }
+  .comp-grid { font-size: 10px; }
+  .comp-grid { grid-template-columns: 1.5fr repeat(4, 1fr); }
+}
+
+/* Strikethrough animation */
+.strike-through {
+  text-decoration: line-through;
+  text-decoration-color: #ff6b6b;
+  text-decoration-thickness: 3px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* Closing slide gradient */
+.slide-closing {
+  background: linear-gradient(135deg, var(--charcoal) 0%, #0d1b3e 100%);
+}
+
+/* Animated counter class */
+.counter[data-target] {
+  display: inline-block;
+}
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+<div id="slide-counter"></div>
+<div id="nav-dots"></div>
+<div id="help-hint">Arrow Keys / Click to navigate &middot; F fullscreen &middot; N notes</div>
+
+<div id="deck">
+
+  <!-- SLIDE 1: OPENING -->
+  <div class="slide" data-notes="Open with silence. Let the word sit. This is Steve Jobs 'one more thing' energy -- create tension before the reveal.">
+    <div class="bg-glow" style="top:-200px;right:-200px;"></div>
+    <div class="fade-up brand-mark">Veritas</div>
+    <h1 class="fade-up" style="margin-bottom:32px;">Justice is <span class="blue-glow">broken.</span></h1>
+    <p class="fade-up">It's the most important promise a society makes.<br>And it's completely, utterly failing.</p>
+  </div>
+
+  <!-- SLIDE 2: THE PROBLEM -->
+  <div class="slide" data-notes="Pause after each number. Let the audience feel the weight. $91,000 is more than the median American's annual savings. 90% of businesses with legitimate disputes never pursue them.">
+    <h2 class="fade-up">The cost of justice</h2>
+    <div class="stat-row fade-up">
+      <div class="stat-block">
+        <div class="stat-number">$<span class="counter" data-target="91" data-suffix="K">0</span></div>
+        <div class="stat-label">Average cost</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-number"><span class="counter" data-target="18" data-suffix=" mo">0</span></div>
+        <div class="stat-label">Time to resolve</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-number"><span class="counter" data-target="90" data-suffix="%">0</span></div>
+        <div class="stat-label">Disputes abandoned</div>
+      </div>
+    </div>
+    <p class="fade-up" style="margin-top:36px;">Arbitration was built to escape the courts.<br>It became the courts -- with the same bills.</p>
+  </div>
+
+  <!-- SLIDE 3: WHY NOW -->
+  <div class="slide" data-notes="Three forces converging simultaneously. Emphasize GenLayer as the missing piece -- this was literally impossible 12 months ago.">
+    <h2 class="fade-up">Three things just changed.<br><span class="blue">All at once.</span></h2>
+    <div class="why-now-list">
+      <div class="why-now-item fade-up">
+        <div class="why-now-num">1</div>
+        <div class="why-now-text"><strong>LLMs can reason about law.</strong> 90th-percentile bar exam. Contract analysis. Legal judgment.</div>
+      </div>
+      <div class="why-now-item fade-up">
+        <div class="why-now-num">2</div>
+        <div class="why-now-text"><strong>Blockchain enforces outcomes.</strong> Smart contract escrow. Verdicts execute themselves.</div>
+      </div>
+      <div class="why-now-item fade-up">
+        <div class="why-now-num">3</div>
+        <div class="why-now-text"><strong>GenLayer made them work together.</strong> The first blockchain where contracts can <em>think</em>.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 4: THE SOLUTION (Comparison) -->
+  <div class="slide" data-notes="This is the 'holy shit' slide. Let the numbers speak. $91K vs under $1. Eighteen months vs five minutes. Pause between each comparison for dramatic effect.">
+    <h2 class="fade-up">Same justice. <span class="blue">1000x faster.</span></h2>
+    <div class="compare-table fade-up">
+      <div class="compare-col old">
+        <div class="col-title">Traditional Arbitration</div>
+        <div class="compare-item">
+          <div class="val">$91,000+</div>
+          <div class="desc">Average cost per case</div>
+        </div>
+        <div class="compare-item">
+          <div class="val">18 months</div>
+          <div class="desc">Time to resolution</div>
+        </div>
+        <div class="compare-item">
+          <div class="val">Manual</div>
+          <div class="desc">Enforcement</div>
+        </div>
+      </div>
+      <div class="compare-col new">
+        <div class="col-title">Veritas</div>
+        <div class="compare-item">
+          <div class="val">&lt; $1</div>
+          <div class="desc">Average cost per case</div>
+        </div>
+        <div class="compare-item">
+          <div class="val">5 min</div>
+          <div class="desc">Time to resolution</div>
+        </div>
+        <div class="compare-item">
+          <div class="val">Automatic</div>
+          <div class="desc">On-chain escrow</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 5: HOW IT WORKS -->
+  <div class="slide" data-notes="Keep it simple. Three steps. File, Deliberate, Resolve. Emphasize the consensus mechanism -- no single AI decides. Multiple validators reason independently, then converge.">
+    <h2 class="fade-up">How it works</h2>
+    <p class="fade-up subtitle" style="margin-bottom:8px;">Three steps. Five minutes. Under a dollar.</p>
+    <div class="steps">
+      <div class="step fade-up">
+        <div class="step-num">Step 01</div>
+        <div class="step-title">File</div>
+        <div class="step-desc">Submit dispute on-chain. Contract, evidence, claim. Immutable. Timestamped.</div>
+      </div>
+      <div class="step fade-up">
+        <div class="step-num">Step 02</div>
+        <div class="step-title">Deliberate</div>
+        <div class="step-desc">AI validators independently analyze, reason, and reach consensus via GenLayer.</div>
+      </div>
+      <div class="step fade-up">
+        <div class="step-num">Step 03</div>
+        <div class="step-title">Resolve</div>
+        <div class="step-desc">Verdict on-chain. Escrow releases funds automatically. Done.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 6: TECHNOLOGY -->
+  <div class="slide" data-notes="GenLayer is the key differentiator. Traditional blockchains are deterministic -- if x then y. GenLayer contracts can REASON. This is the first blockchain where arbitration is architecturally possible.">
+    <h2 class="fade-up">Why <span class="blue">GenLayer</span><br>changes everything</h2>
+    <p class="fade-up" style="margin-top:16px;margin-bottom:32px;">The first blockchain where smart contracts can <em>think.</em></p>
+    <div class="stat-row">
+      <div class="stat-block fade-up">
+        <div class="stat-number" style="font-size:clamp(24px,3vw,42px);">Python</div>
+        <div class="stat-label">Native contracts</div>
+      </div>
+      <div class="stat-block fade-up">
+        <div class="stat-number" style="font-size:clamp(24px,3vw,42px);">Multi-LLM</div>
+        <div class="stat-label">Validator consensus</div>
+      </div>
+      <div class="stat-block fade-up">
+        <div class="stat-number" style="font-size:clamp(24px,3vw,42px);">On-chain</div>
+        <div class="stat-label">Auto-enforcement</div>
+      </div>
+    </div>
+    <p class="fade-up" style="margin-top:32px;font-size:clamp(14px,1.3vw,18px);">Arbitration is inherently subjective. GenLayer is the only chain<br>where subjective reasoning is possible natively.</p>
+  </div>
+
+  <!-- SLIDE 7: DEMO -->
+  <div class="slide" data-notes="If doing a live demo, switch to the app now. Otherwise, describe the scenario: freelancer in Buenos Aires, client in Berlin, $2K website dispute. Filed, deliberated, resolved in under 5 minutes.">
+    <div class="bg-glow" style="bottom:-300px;left:-200px;"></div>
+    <div class="fade-up" style="margin-bottom:24px;"><span class="pulse-dot"></span><span style="font-size:13px;text-transform:uppercase;letter-spacing:3px;font-weight:600;color:var(--gray);">Live Demo</span></div>
+    <h2 class="fade-up">See it work.</h2>
+    <p class="fade-up" style="margin-top:20px;">A freelancer in Buenos Aires. A client in Berlin.<br>A $2,000 project gone wrong.</p>
+    <p class="fade-up" style="margin-top:16px;color:var(--gray);">Filed, deliberated, and resolved in under five minutes.<br>No lawyers. No translators. No jurisdictional headaches.</p>
+  </div>
+
+  <!-- SLIDE 8: MARKET (TAM/SAM/SOM) -->
+  <div class="slide" data-notes="$14.2B global arbitration market. But the real opportunity is the 90% of disputes that are NEVER FILED because the cost exceeds the claim. We're not competing for existing market -- we're unlocking demand that was never economical.">
+    <h2 class="fade-up">Market opportunity</h2>
+    <div style="display:flex;align-items:center;gap:48px;flex-wrap:wrap;justify-content:center;">
+      <div class="tam-container fade-up">
+        <div class="tam-circle tam">
+          <div class="circle-val">$14.2B</div>
+          <div class="circle-label">TAM</div>
+        </div>
+        <div class="tam-circle sam">
+          <div class="circle-val">$4.5B</div>
+          <div class="circle-label">SAM</div>
+        </div>
+        <div class="tam-circle som">
+          <div class="circle-val">$225M</div>
+          <div class="circle-label">SOM</div>
+        </div>
+      </div>
+      <div class="fade-up" style="text-align:left;max-width:340px;">
+        <div style="margin-bottom:20px;">
+          <div style="font-size:13px;color:var(--blue);font-weight:600;text-transform:uppercase;letter-spacing:1px;">Beachheads</div>
+        </div>
+        <div style="font-size:15px;color:var(--light-gray);line-height:2;">
+          Crypto-native disputes<br>
+          Freelancer / gig economy<br>
+          Cross-border e-commerce<br>
+          Small business contracts
+        </div>
+        <p style="font-size:13px;color:var(--gray);margin-top:16px;line-height:1.6;">Plus $10.5B in adjacent markets:<br>insurance claims, DAO governance,<br>consumer e-commerce</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 9: BUSINESS MODEL -->
+  <div class="slide" data-notes="97% gross margin. Near-zero marginal cost per dispute. This is a software business masquerading as legal infrastructure. Revenue per dispute from $0.50 to $50. LTV:CAC of 10:1. CAC payback in 2 months.">
+    <h2 class="fade-up">Business model</h2>
+    <p class="fade-up subtitle">Software margins. Legal infrastructure.</p>
+    <div class="bm-cards">
+      <div class="bm-card fade-up">
+        <div class="bm-val">97%</div>
+        <div class="bm-label">Gross Margin</div>
+      </div>
+      <div class="bm-card fade-up">
+        <div class="bm-val">10:1</div>
+        <div class="bm-label">LTV : CAC</div>
+      </div>
+      <div class="bm-card fade-up">
+        <div class="bm-val">$0.15</div>
+        <div class="bm-label">Cost / Dispute</div>
+      </div>
+      <div class="bm-card fade-up">
+        <div class="bm-val">2 mo</div>
+        <div class="bm-label">CAC Payback</div>
+      </div>
+    </div>
+    <div class="fade-up" style="margin-top:36px;display:flex;gap:32px;flex-wrap:wrap;justify-content:center;">
+      <div style="text-align:center;">
+        <div style="font-size:13px;color:var(--gray);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Micro &lt;$500</div>
+        <div style="font-size:22px;font-weight:700;color:var(--white);">$0.50 <span style="font-size:13px;color:var(--gray);font-weight:400;">flat</span></div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-size:13px;color:var(--gray);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Standard $500-$10K</div>
+        <div style="font-size:22px;font-weight:700;color:var(--white);">1-2% <span style="font-size:13px;color:var(--gray);font-weight:400;">of claim</span></div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-size:13px;color:var(--gray);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Enterprise $10K+</div>
+        <div style="font-size:22px;font-weight:700;color:var(--white);">0.5-1% <span style="font-size:13px;color:var(--gray);font-weight:400;">of claim</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 10: COMPETITIVE LANDSCAPE -->
+  <div class="slide" data-notes="There is no real competition yet. Kleros uses human jurors -- clever but slow and doesn't scale. Traditional arbitration is absurdly expensive. We are the only system with full LLM consensus and automatic on-chain enforcement.">
+    <h2 class="fade-up">There is no competition. <span class="blue">Yet.</span></h2>
+    <div class="comp-grid fade-up">
+      <div class="comp-cell header"></div>
+      <div class="comp-cell header">Traditional</div>
+      <div class="comp-cell header">ODR Platforms</div>
+      <div class="comp-cell header">Kleros</div>
+      <div class="comp-cell header" style="color:var(--blue);">Veritas</div>
+
+      <div class="comp-cell row-label">Cost</div>
+      <div class="comp-cell">$91K+</div>
+      <div class="comp-cell">$500-5K</div>
+      <div class="comp-cell">$50-500</div>
+      <div class="comp-cell highlight">&lt; $1</div>
+
+      <div class="comp-cell row-label">Speed</div>
+      <div class="comp-cell">12-18 mo</div>
+      <div class="comp-cell">2-8 weeks</div>
+      <div class="comp-cell">1-4 weeks</div>
+      <div class="comp-cell highlight">~5 min</div>
+
+      <div class="comp-cell row-label">AI Reasoning</div>
+      <div class="comp-cell">No</div>
+      <div class="comp-cell">Basic NLP</div>
+      <div class="comp-cell">No</div>
+      <div class="comp-cell highlight">Full LLM</div>
+
+      <div class="comp-cell row-label">Enforcement</div>
+      <div class="comp-cell">Manual</div>
+      <div class="comp-cell">Manual</div>
+      <div class="comp-cell">Partial</div>
+      <div class="comp-cell highlight">Automatic</div>
+
+      <div class="comp-cell row-label">Cross-border</div>
+      <div class="comp-cell">Complex</div>
+      <div class="comp-cell">Limited</div>
+      <div class="comp-cell">Yes</div>
+      <div class="comp-cell highlight">Native</div>
+    </div>
+  </div>
+
+  <!-- SLIDE 11: TRACTION & ROADMAP -->
+  <div class="slide" data-notes="We're live on GenLayer testnet right now. Working frontend, end-to-end dispute resolution. Mainnet in Q2, marketplace integrations Q3, enterprise by Q4. $12M ARR target Year 3.">
+    <h2 class="fade-up">Roadmap</h2>
+    <div class="roadmap">
+      <div class="roadmap-item fade-up">
+        <div class="roadmap-phase">Now</div>
+        <div class="roadmap-title">Hackathon</div>
+        <div class="roadmap-desc">Contract on GenLayer Testnet. Working frontend. Live demo. End-to-end resolution.</div>
+      </div>
+      <div class="roadmap-item fade-up">
+        <div class="roadmap-phase">Q2 2026</div>
+        <div class="roadmap-title">Genesis</div>
+        <div class="roadmap-desc">Mainnet deployment. First crypto-native pilots. API for integrations.</div>
+      </div>
+      <div class="roadmap-item fade-up">
+        <div class="roadmap-phase">Q3 2026</div>
+        <div class="roadmap-title">Scale</div>
+        <div class="roadmap-desc">Marketplace integrations. Custom rulesets. Multi-language evidence.</div>
+      </div>
+      <div class="roadmap-item fade-up">
+        <div class="roadmap-phase">Q4 2026</div>
+        <div class="roadmap-title">Enterprise</div>
+        <div class="roadmap-desc">Enterprise API. Compliance framework. Analytics dashboard. $12M ARR target.</div>
+      </div>
+    </div>
+    <div class="stat-row fade-up" style="margin-top:36px;">
+      <div class="stat-block">
+        <div class="stat-number" style="font-size:clamp(24px,3vw,36px);">10M</div>
+        <div class="stat-label">Disputes Yr 3</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-number" style="font-size:clamp(24px,3vw,36px);">$5B</div>
+        <div class="stat-label">Value Arbitrated</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-number" style="font-size:clamp(24px,3vw,36px);">200</div>
+        <div class="stat-label">Integrations</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 12: THE CLOSE -->
+  <div class="slide slide-closing" data-notes="Slow down. Lower your voice. This is the emotional close. Every few decades, technology makes something expensive... free. Email did it to mail. Skype to calls. Google to research. Veritas does it to justice. End with the tagline. Let it land.">
+    <div class="bg-glow" style="top:50%;left:50%;transform:translate(-50%,-50%);opacity:0.12;"></div>
+    <div class="quote fade-up" style="margin-bottom:40px;">
+      "Every few decades, technology makes something that was expensive... <span class="blue">free.</span>"
+    </div>
+    <p class="fade-up" style="font-size:clamp(16px,1.8vw,24px);color:var(--light-gray);line-height:1.7;max-width:700px;">
+      Email did it to mail. Skype did it to calls.<br>Google did it to research.
+    </p>
+    <h1 class="fade-up" style="margin-top:40px;margin-bottom:16px;">
+      <span class="blue-glow">Veritas</span> does it to justice.
+    </h1>
+    <p class="fade-up tagline" style="margin-top:20px;">Truth needs no advocate. Just consensus.</p>
+    <p class="fade-up" style="margin-top:32px;font-size:13px;color:var(--gray);">GenLayer Testnet Bradbury Hackathon</p>
+  </div>
+
+</div>
+
+<div id="notes-panel"></div>
+
+<script>
+(function() {
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let current = 0;
+  let notesVisible = false;
+
+  const progress = document.getElementById('progress');
+  const counter = document.getElementById('slide-counter');
+  const dotsContainer = document.getElementById('nav-dots');
+  const notesPanel = document.getElementById('notes-panel');
+
+  // Create nav dots
+  for (let i = 0; i < total; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'nav-dot';
+    dot.addEventListener('click', () => goTo(i));
+    dotsContainer.appendChild(dot);
+  }
+
+  function updateUI() {
+    progress.style.width = ((current + 1) / total * 100) + '%';
+    counter.textContent = (current + 1) + ' / ' + total;
+
+    const dots = dotsContainer.querySelectorAll('.nav-dot');
+    dots.forEach((d, i) => d.classList.toggle('active', i === current));
+
+    slides.forEach((s, i) => {
+      s.classList.remove('active', 'exit-left');
+      if (i === current) {
+        s.classList.add('active');
+        animateCounters(s);
+      } else if (i < current) {
+        s.classList.add('exit-left');
+      }
+    });
+
+    // Speaker notes
+    const note = slides[current].getAttribute('data-notes') || 'No notes for this slide.';
+    notesPanel.textContent = note;
+  }
+
+  function goTo(index) {
+    if (index < 0 || index >= total) return;
+    current = index;
+    updateUI();
+  }
+
+  function next() { goTo(current + 1); }
+  function prev() { goTo(current - 1); }
+
+  // Animated counters
+  function animateCounters(slide) {
+    const counters = slide.querySelectorAll('.counter[data-target]');
+    counters.forEach(el => {
+      if (el.dataset.animated) return;
+      el.dataset.animated = 'true';
+      const target = parseInt(el.dataset.target);
+      const suffix = el.dataset.suffix || '';
+      const duration = 1200;
+      const start = performance.now();
+      function tick(now) {
+        const elapsed = now - start;
+        const p = Math.min(elapsed / duration, 1);
+        const eased = 1 - Math.pow(1 - p, 3);
+        const val = Math.round(eased * target);
+        el.textContent = val + suffix;
+        if (p < 1) requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    });
+  }
+
+  // Keyboard navigation
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+      e.preventDefault();
+      next();
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      prev();
+    } else if (e.key === 'f' || e.key === 'F') {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen();
+      }
+    } else if (e.key === 'n' || e.key === 'N') {
+      notesVisible = !notesVisible;
+      notesPanel.classList.toggle('visible', notesVisible);
+    } else if (e.key === 'Home') {
+      goTo(0);
+    } else if (e.key === 'End') {
+      goTo(total - 1);
+    }
+  });
+
+  // Click navigation (left third = back, right two-thirds = forward)
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('#nav-dots') || e.target.closest('#notes-panel') || e.target.closest('#help-hint')) return;
+    const x = e.clientX / window.innerWidth;
+    if (x < 0.33) prev(); else next();
+  });
+
+  // Touch support
+  let touchStartX = 0;
+  document.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].screenX; });
+  document.addEventListener('touchend', (e) => {
+    const diff = touchStartX - e.changedTouches[0].screenX;
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) next(); else prev();
+    }
+  });
+
+  // Init
+  updateUI();
+})();
+</script>
+</body>
+</html>

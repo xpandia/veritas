@@ -1,0 +1,1523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Veritas — AI-Powered Decentralized Arbitration</title>
+    <meta name="description" content="Resolve disputes in minutes, not months. Veritas brings AI-consensus arbitration to the blockchain.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --charcoal: #1a1a2e;
+            --charcoal-light: #22223a;
+            --charcoal-lighter: #2a2a45;
+            --blue: #0066ff;
+            --blue-light: #3388ff;
+            --blue-glow: rgba(0, 102, 255, 0.15);
+            --blue-glow-strong: rgba(0, 102, 255, 0.3);
+            --white: #ffffff;
+            --gray-100: #f0f0f5;
+            --gray-200: #d0d0dd;
+            --gray-300: #a0a0b5;
+            --gray-400: #70708a;
+            --gold: #c9a84c;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--charcoal);
+            color: var(--gray-100);
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ============ CANVAS BACKGROUND ============ */
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* ============ NAVIGATION ============ */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 1.25rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.4s ease;
+            backdrop-filter: blur(0px);
+        }
+
+        nav.scrolled {
+            background: rgba(26, 26, 46, 0.92);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0, 102, 255, 0.1);
+            padding: 0.75rem 2rem;
+        }
+
+        .nav-logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: var(--white);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-logo .logo-icon {
+            width: 32px;
+            height: 32px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--gray-300);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--white);
+        }
+
+        .nav-cta {
+            background: var(--blue);
+            color: var(--white) !important;
+            padding: 0.6rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600 !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .nav-cta:hover {
+            background: var(--blue-light);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 20px rgba(0, 102, 255, 0.4);
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 4px;
+        }
+
+        .mobile-menu-btn span {
+            width: 24px;
+            height: 2px;
+            background: var(--white);
+            transition: all 0.3s ease;
+        }
+
+        /* ============ SECTIONS (shared) ============ */
+        section {
+            position: relative;
+            z-index: 1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .section-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--blue);
+            margin-bottom: 1rem;
+        }
+
+        .section-title {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            line-height: 1.15;
+            color: var(--white);
+            margin-bottom: 1.25rem;
+        }
+
+        .section-subtitle {
+            font-size: 1.125rem;
+            color: var(--gray-300);
+            max-width: 600px;
+            line-height: 1.7;
+        }
+
+        /* ============ HERO ============ */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 6rem 2rem 4rem;
+            position: relative;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 200px;
+            background: linear-gradient(to bottom, transparent, var(--charcoal));
+            z-index: 1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 900px;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(0, 102, 255, 0.1);
+            border: 1px solid rgba(0, 102, 255, 0.25);
+            padding: 0.5rem 1.25rem;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--blue-light);
+            margin-bottom: 2.5rem;
+            letter-spacing: 0.03em;
+        }
+
+        .hero-badge .pulse {
+            width: 8px;
+            height: 8px;
+            background: var(--blue);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(0, 102, 255, 0.4); }
+            50% { opacity: 0.8; box-shadow: 0 0 0 8px rgba(0, 102, 255, 0); }
+        }
+
+        .hero h1 {
+            font-size: clamp(3rem, 7vw, 5.5rem);
+            font-weight: 900;
+            letter-spacing: -0.04em;
+            line-height: 1.05;
+            color: var(--white);
+            margin-bottom: 1.75rem;
+        }
+
+        .hero h1 .highlight {
+            background: linear-gradient(135deg, var(--blue), var(--blue-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: clamp(1.05rem, 2vw, 1.3rem);
+            color: var(--gray-300);
+            max-width: 620px;
+            margin: 0 auto 3rem;
+            line-height: 1.7;
+            font-weight: 400;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: var(--blue);
+            color: var(--white);
+            padding: 1rem 2.5rem;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary:hover {
+            background: var(--blue-light);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 102, 255, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--gray-200);
+            padding: 1rem 2.5rem;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-secondary:hover {
+            border-color: rgba(255, 255, 255, 0.3);
+            color: var(--white);
+            background: rgba(255, 255, 255, 0.04);
+            transform: translateY(-2px);
+        }
+
+        /* ============ SCALES OF JUSTICE ANIMATION ============ */
+        .hero-visual {
+            margin-top: 4rem;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 220px;
+        }
+
+        .scales-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+        }
+
+        .scales-svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 0 30px rgba(0, 102, 255, 0.2));
+        }
+
+        .scales-svg .beam {
+            animation: scaleBalance 4s ease-in-out infinite;
+            transform-origin: 100px 60px;
+        }
+
+        @keyframes scaleBalance {
+            0%, 100% { transform: rotate(-3deg); }
+            50% { transform: rotate(3deg); }
+        }
+
+        /* AI orbit particles around scales */
+        .orbit-particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: var(--blue);
+            border-radius: 50%;
+            box-shadow: 0 0 12px var(--blue), 0 0 24px rgba(0, 102, 255, 0.3);
+        }
+
+        .orbit-particle:nth-child(1) { animation: orbit1 6s linear infinite; }
+        .orbit-particle:nth-child(2) { animation: orbit2 8s linear infinite; }
+        .orbit-particle:nth-child(3) { animation: orbit3 7s linear infinite; }
+        .orbit-particle:nth-child(4) { animation: orbit4 5s linear infinite; }
+        .orbit-particle:nth-child(5) { animation: orbit5 9s linear infinite; }
+
+        @keyframes orbit1 {
+            0% { transform: translate(100px, 100px) rotate(0deg) translateX(110px) rotate(0deg); opacity: 0.8; }
+            50% { opacity: 1; }
+            100% { transform: translate(100px, 100px) rotate(360deg) translateX(110px) rotate(-360deg); opacity: 0.8; }
+        }
+        @keyframes orbit2 {
+            0% { transform: translate(100px, 100px) rotate(90deg) translateX(130px) rotate(-90deg); opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { transform: translate(100px, 100px) rotate(450deg) translateX(130px) rotate(-450deg); opacity: 0.6; }
+        }
+        @keyframes orbit3 {
+            0% { transform: translate(100px, 100px) rotate(180deg) translateX(95px) rotate(-180deg); opacity: 0.7; }
+            50% { opacity: 1; }
+            100% { transform: translate(100px, 100px) rotate(540deg) translateX(95px) rotate(-540deg); opacity: 0.7; }
+        }
+        @keyframes orbit4 {
+            0% { transform: translate(100px, 100px) rotate(45deg) translateX(120px) rotate(-45deg); opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { transform: translate(100px, 100px) rotate(405deg) translateX(120px) rotate(-405deg); opacity: 0.5; }
+        }
+        @keyframes orbit5 {
+            0% { transform: translate(100px, 100px) rotate(270deg) translateX(140px) rotate(-270deg); opacity: 0.4; }
+            50% { opacity: 0.9; }
+            100% { transform: translate(100px, 100px) rotate(630deg) translateX(140px) rotate(-630deg); opacity: 0.4; }
+        }
+
+        /* ============ STATS BAR ============ */
+        .stats {
+            padding: 4rem 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+            text-align: center;
+        }
+
+        .stat-item {
+            padding: 1rem;
+        }
+
+        .stat-number {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800;
+            color: var(--white);
+            letter-spacing: -0.03em;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-number .unit {
+            font-size: 0.5em;
+            color: var(--blue);
+            font-weight: 700;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--gray-400);
+            font-weight: 500;
+        }
+
+        /* ============ PROBLEM ============ */
+        .problem {
+            padding: 8rem 0;
+        }
+
+        .problem-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            margin-top: 3rem;
+        }
+
+        .problem-card {
+            background: linear-gradient(135deg, rgba(255, 60, 60, 0.06), rgba(255, 60, 60, 0.02));
+            border: 1px solid rgba(255, 60, 60, 0.12);
+            border-radius: 20px;
+            padding: 2.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .problem-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #ff3c3c, transparent);
+        }
+
+        .problem-card h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 1rem;
+        }
+
+        .problem-card p {
+            color: var(--gray-300);
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+
+        .problem-stat {
+            display: flex;
+            align-items: baseline;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .problem-stat .number {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #ff5c5c;
+        }
+
+        .problem-stat .label {
+            font-size: 0.85rem;
+            color: var(--gray-400);
+        }
+
+        .solution-preview {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .solution-preview-item {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .solution-check {
+            width: 24px;
+            height: 24px;
+            min-width: 24px;
+            background: rgba(0, 102, 255, 0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 2px;
+        }
+
+        .solution-check svg {
+            width: 12px;
+            height: 12px;
+        }
+
+        .solution-preview-item h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--white);
+            margin-bottom: 0.25rem;
+        }
+
+        .solution-preview-item p {
+            font-size: 0.9rem;
+            color: var(--gray-300);
+            line-height: 1.6;
+        }
+
+        /* ============ HOW IT WORKS ============ */
+        .how-it-works {
+            padding: 8rem 0;
+            background: linear-gradient(180deg, var(--charcoal) 0%, var(--charcoal-light) 50%, var(--charcoal) 100%);
+        }
+
+        .how-header {
+            text-align: center;
+            margin-bottom: 5rem;
+        }
+
+        .how-header .section-subtitle {
+            margin: 0 auto;
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            position: relative;
+        }
+
+        .steps::before {
+            content: '';
+            position: absolute;
+            top: 60px;
+            left: calc(16.66% + 1rem);
+            right: calc(16.66% + 1rem);
+            height: 2px;
+            background: linear-gradient(90deg, var(--blue), var(--blue-light), var(--blue));
+            opacity: 0.3;
+        }
+
+        .step {
+            text-align: center;
+            position: relative;
+        }
+
+        .step-icon {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 2rem;
+            background: linear-gradient(135deg, var(--charcoal-lighter), var(--charcoal-light));
+            border: 1px solid rgba(0, 102, 255, 0.2);
+            border-radius: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            transition: all 0.4s ease;
+        }
+
+        .step:hover .step-icon {
+            border-color: var(--blue);
+            box-shadow: 0 0 40px var(--blue-glow);
+            transform: translateY(-4px);
+        }
+
+        .step-number {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 32px;
+            height: 32px;
+            background: var(--blue);
+            color: var(--white);
+            border-radius: 50%;
+            font-size: 0.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .step-icon svg {
+            width: 48px;
+            height: 48px;
+        }
+
+        .step h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 0.75rem;
+        }
+
+        .step p {
+            font-size: 0.95rem;
+            color: var(--gray-300);
+            line-height: 1.7;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        /* ============ USE CASES ============ */
+        .use-cases {
+            padding: 8rem 0;
+        }
+
+        .use-cases-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .use-cases-header .section-subtitle {
+            margin: 0 auto;
+        }
+
+        .cases-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .case-card {
+            background: var(--charcoal-light);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+            padding: 2.5rem 2rem;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .case-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--blue), transparent);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .case-card:hover::before {
+            opacity: 1;
+        }
+
+        .case-card:hover {
+            border-color: rgba(0, 102, 255, 0.2);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .case-icon {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            display: block;
+        }
+
+        .case-card h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 0.75rem;
+        }
+
+        .case-card p {
+            font-size: 0.9rem;
+            color: var(--gray-300);
+            line-height: 1.7;
+        }
+
+        /* ============ TRUST & SECURITY ============ */
+        .trust {
+            padding: 8rem 0;
+            background: linear-gradient(180deg, var(--charcoal) 0%, var(--charcoal-light) 50%, var(--charcoal) 100%);
+        }
+
+        .trust-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            margin-top: 3rem;
+        }
+
+        .trust-features {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .trust-feature {
+            display: flex;
+            gap: 1.25rem;
+            align-items: flex-start;
+        }
+
+        .trust-icon {
+            width: 48px;
+            height: 48px;
+            min-width: 48px;
+            background: linear-gradient(135deg, rgba(0, 102, 255, 0.15), rgba(0, 102, 255, 0.05));
+            border: 1px solid rgba(0, 102, 255, 0.2);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .trust-icon svg {
+            width: 22px;
+            height: 22px;
+        }
+
+        .trust-feature h4 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--white);
+            margin-bottom: 0.35rem;
+        }
+
+        .trust-feature p {
+            font-size: 0.9rem;
+            color: var(--gray-300);
+            line-height: 1.6;
+        }
+
+        .trust-visual {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .trust-graphic {
+            width: 100%;
+            max-width: 400px;
+            aspect-ratio: 1;
+            background: radial-gradient(circle at center, var(--blue-glow) 0%, transparent 70%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .trust-graphic::before {
+            content: '';
+            position: absolute;
+            width: 70%;
+            height: 70%;
+            border: 1px solid rgba(0, 102, 255, 0.15);
+            border-radius: 50%;
+            animation: trustPulse 4s ease-in-out infinite;
+        }
+
+        .trust-graphic::after {
+            content: '';
+            position: absolute;
+            width: 90%;
+            height: 90%;
+            border: 1px solid rgba(0, 102, 255, 0.08);
+            border-radius: 50%;
+            animation: trustPulse 4s ease-in-out infinite 1s;
+        }
+
+        @keyframes trustPulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.6; }
+        }
+
+        .trust-center-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--charcoal-lighter);
+            border: 2px solid rgba(0, 102, 255, 0.3);
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+        }
+
+        .trust-center-icon svg {
+            width: 36px;
+            height: 36px;
+        }
+
+        /* ============ CTA ============ */
+        .cta {
+            padding: 8rem 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .cta::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 600px;
+            height: 600px;
+            transform: translate(-50%, -50%);
+            background: radial-gradient(circle, var(--blue-glow) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .cta-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .cta h2 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 900;
+            letter-spacing: -0.04em;
+            color: var(--white);
+            margin-bottom: 1.25rem;
+            line-height: 1.1;
+        }
+
+        .cta p {
+            font-size: 1.15rem;
+            color: var(--gray-300);
+            max-width: 550px;
+            margin: 0 auto 2.5rem;
+            line-height: 1.7;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* ============ FOOTER ============ */
+        footer {
+            padding: 4rem 0 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+        }
+
+        .footer-logo {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--white);
+            letter-spacing: -0.02em;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .footer-links a {
+            color: var(--gray-400);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--gray-200);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .footer-bottom p {
+            font-size: 0.8rem;
+            color: var(--gray-400);
+        }
+
+        .footer-bottom .powered-by {
+            margin-top: 0.5rem;
+            font-size: 0.75rem;
+            color: var(--gray-400);
+        }
+
+        .footer-bottom .powered-by a {
+            color: var(--blue);
+            text-decoration: none;
+        }
+
+        /* ============ SCROLL REVEAL ============ */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ============ RESPONSIVE ============ */
+        @media (max-width: 1024px) {
+            .problem-grid,
+            .trust-grid {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+            }
+
+            .cases-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(26, 26, 46, 0.98);
+                backdrop-filter: blur(20px);
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                gap: 2rem;
+                z-index: 99;
+            }
+
+            .nav-links.open {
+                display: flex;
+            }
+
+            .nav-links a {
+                font-size: 1.25rem;
+            }
+
+            .mobile-menu-btn {
+                display: flex;
+                z-index: 101;
+            }
+
+            .hero h1 {
+                font-size: clamp(2.5rem, 10vw, 3.5rem);
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.5rem;
+            }
+
+            .steps {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+            }
+
+            .steps::before {
+                display: none;
+            }
+
+            .cases-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-visual {
+                margin-top: 2rem;
+                height: 160px;
+            }
+
+            .scales-container {
+                width: 150px;
+                height: 150px;
+            }
+
+            .trust-visual {
+                order: -1;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                gap: 1.5rem;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Particle Background -->
+    <canvas id="particle-canvas"></canvas>
+
+    <!-- Navigation -->
+    <nav id="navbar">
+        <a href="#" class="nav-logo">
+            <svg class="logo-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="32" height="32" rx="8" fill="#0066ff"/>
+                <path d="M16 6L8 12V20L16 26L24 20V12L16 6Z" stroke="white" stroke-width="2" fill="none"/>
+                <circle cx="16" cy="16" r="3" fill="white"/>
+            </svg>
+            Veritas
+        </a>
+        <ul class="nav-links" id="nav-links">
+            <li><a href="#problem">Problem</a></li>
+            <li><a href="#solution">Solution</a></li>
+            <li><a href="#how-it-works">How It Works</a></li>
+            <li><a href="#use-cases">Use Cases</a></li>
+            <li><a href="#trust">Security</a></li>
+            <li><a href="#cta" class="nav-cta">Get Started</a></li>
+        </ul>
+        <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Toggle menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span class="pulse"></span>
+                Built on GenLayer Blockchain
+            </div>
+            <h1>Justice.<br><span class="highlight">Automated.</span><br>For Everyone.</h1>
+            <p>Resolve disputes in minutes, not months. Veritas replaces expensive arbitrators with AI-consensus validators on a blockchain built to reason.</p>
+            <div class="hero-buttons">
+                <a href="#cta" class="btn-primary">
+                    <span>File a Dispute</span>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </a>
+                <a href="#how-it-works" class="btn-secondary">
+                    <span>See How It Works</span>
+                </a>
+            </div>
+
+            <!-- Animated Scales of Justice -->
+            <div class="hero-visual">
+                <div class="scales-container">
+                    <svg class="scales-svg" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Base -->
+                        <rect x="90" y="170" width="20" height="20" rx="3" fill="rgba(0,102,255,0.3)" stroke="rgba(0,102,255,0.5)" stroke-width="1"/>
+                        <rect x="70" y="186" width="60" height="8" rx="4" fill="rgba(0,102,255,0.2)" stroke="rgba(0,102,255,0.4)" stroke-width="1"/>
+                        <!-- Pillar -->
+                        <rect x="97" y="60" width="6" height="114" rx="3" fill="rgba(0,102,255,0.3)" stroke="rgba(0,102,255,0.5)" stroke-width="1"/>
+                        <!-- Beam group (animated) -->
+                        <g class="beam">
+                            <!-- Beam -->
+                            <rect x="30" y="58" width="140" height="5" rx="2.5" fill="rgba(0,102,255,0.4)" stroke="rgba(0,102,255,0.6)" stroke-width="1"/>
+                            <!-- Left chain -->
+                            <line x1="40" y1="63" x2="40" y2="95" stroke="rgba(0,102,255,0.5)" stroke-width="1.5"/>
+                            <!-- Right chain -->
+                            <line x1="160" y1="63" x2="160" y2="95" stroke="rgba(0,102,255,0.5)" stroke-width="1.5"/>
+                            <!-- Left pan -->
+                            <path d="M15 95 Q40 110 65 95" stroke="rgba(0,102,255,0.5)" stroke-width="1.5" fill="rgba(0,102,255,0.1)"/>
+                            <!-- Right pan -->
+                            <path d="M135 95 Q160 110 185 95" stroke="rgba(0,102,255,0.5)" stroke-width="1.5" fill="rgba(0,102,255,0.1)"/>
+                            <!-- Top ornament -->
+                            <circle cx="100" cy="52" r="8" fill="rgba(0,102,255,0.2)" stroke="rgba(0,102,255,0.6)" stroke-width="1.5"/>
+                            <circle cx="100" cy="52" r="3" fill="#0066ff"/>
+                        </g>
+                    </svg>
+                    <!-- AI Orbiting Particles -->
+                    <div class="orbit-particle"></div>
+                    <div class="orbit-particle"></div>
+                    <div class="orbit-particle"></div>
+                    <div class="orbit-particle"></div>
+                    <div class="orbit-particle"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Bar -->
+    <section class="stats">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-item reveal">
+                    <div class="stat-number">$91K<span class="unit">+</span></div>
+                    <div class="stat-label">Average arbitration cost</div>
+                </div>
+                <div class="stat-item reveal">
+                    <div class="stat-number">18<span class="unit">mo</span></div>
+                    <div class="stat-label">Average resolution time</div>
+                </div>
+                <div class="stat-item reveal">
+                    <div class="stat-number">< $1<span class="unit"></span></div>
+                    <div class="stat-label">Veritas resolution cost</div>
+                </div>
+                <div class="stat-item reveal">
+                    <div class="stat-number">~5<span class="unit">min</span></div>
+                    <div class="stat-label">Veritas resolution time</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Problem Section -->
+    <section class="problem" id="problem">
+        <div class="container">
+            <div class="reveal">
+                <span class="section-label">The Problem</span>
+                <h2 class="section-title">Justice has a price tag.<br>Most people can't afford it.</h2>
+                <p class="section-subtitle">The current arbitration system is designed for corporations with unlimited budgets, not for the people who need it most.</p>
+            </div>
+            <div class="problem-grid">
+                <div class="problem-card reveal">
+                    <h3>Prohibitive Cost</h3>
+                    <p>Filing fees, arbitrator compensation, legal representation, administrative costs. A simple contract dispute can drain a small business dry before a decision is ever reached.</p>
+                    <div class="problem-stat">
+                        <span class="number">$91,000+</span>
+                        <span class="label">average cost per commercial arbitration case</span>
+                    </div>
+                </div>
+                <div class="problem-card reveal">
+                    <h3>Agonizing Delay</h3>
+                    <p>Scheduling conflicts, document discovery, hearing preparation, deliberation periods. The process that was meant to be faster than litigation now mirrors its worst traits.</p>
+                    <div class="problem-stat">
+                        <span class="number">12-18 mo</span>
+                        <span class="label">average time to resolution</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Solution Section -->
+    <section id="solution" style="padding: 0 0 4rem;">
+        <div class="container">
+            <div class="reveal" style="margin-bottom: 3rem;">
+                <span class="section-label">The Solution</span>
+                <h2 class="section-title">Replace arbitrators with<br>AI consensus validators.</h2>
+                <p class="section-subtitle">Veritas runs on GenLayer, the only blockchain where smart contracts can reason, analyze evidence, and reach fair verdicts.</p>
+            </div>
+            <div class="solution-preview reveal">
+                <div class="solution-preview-item">
+                    <div class="solution-check">
+                        <svg viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#0066ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </div>
+                    <div>
+                        <h4>AI-Powered Reasoning</h4>
+                        <p>Multiple independent AI validators analyze contracts, evidence, and applicable legal frameworks to form reasoned judgments.</p>
+                    </div>
+                </div>
+                <div class="solution-preview-item">
+                    <div class="solution-check">
+                        <svg viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#0066ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </div>
+                    <div>
+                        <h4>Decentralized Consensus</h4>
+                        <p>No single arbitrator. No single point of bias. GenLayer's consensus mechanism ensures multiple AI agents independently agree on the outcome.</p>
+                    </div>
+                </div>
+                <div class="solution-preview-item">
+                    <div class="solution-check">
+                        <svg viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#0066ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </div>
+                    <div>
+                        <h4>On-Chain Enforcement</h4>
+                        <p>Verdicts are binding and self-executing. Escrow releases automatically. No appeals to a slow court system.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="container">
+            <div class="how-header reveal">
+                <span class="section-label">How It Works</span>
+                <h2 class="section-title">Three steps. That's it.</h2>
+                <p class="section-subtitle">From dispute to resolution in minutes. No lawyers, no waiting rooms, no uncertainty.</p>
+            </div>
+            <div class="steps">
+                <div class="step reveal">
+                    <div class="step-icon">
+                        <span class="step-number">1</span>
+                        <svg viewBox="0 0 48 48" fill="none">
+                            <path d="M12 8h20a4 4 0 014 4v24a4 4 0 01-4 4H12a4 4 0 01-4-4V12a4 4 0 014-4z" stroke="#0066ff" stroke-width="2"/>
+                            <path d="M16 18h16M16 24h12M16 30h8" stroke="#0066ff" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M36 16l4-4m0 0l4 4m-4-4v12" stroke="rgba(0,102,255,0.5)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h3>File Your Dispute</h3>
+                    <p>Submit the contract, evidence, and your claim. Everything is recorded immutably on-chain. Both parties deposit escrow.</p>
+                </div>
+                <div class="step reveal">
+                    <div class="step-icon">
+                        <span class="step-number">2</span>
+                        <svg viewBox="0 0 48 48" fill="none">
+                            <circle cx="24" cy="24" r="16" stroke="#0066ff" stroke-width="2"/>
+                            <circle cx="24" cy="24" r="6" stroke="#0066ff" stroke-width="2"/>
+                            <path d="M24 8v4M24 36v4M8 24h4M36 24h4" stroke="rgba(0,102,255,0.5)" stroke-width="2" stroke-linecap="round"/>
+                            <circle cx="24" cy="24" r="2" fill="#0066ff"/>
+                        </svg>
+                    </div>
+                    <h3>AI Deliberates</h3>
+                    <p>GenLayer's AI validators independently analyze the case, consider precedent and contract terms, then reach consensus on a verdict.</p>
+                </div>
+                <div class="step reveal">
+                    <div class="step-icon">
+                        <span class="step-number">3</span>
+                        <svg viewBox="0 0 48 48" fill="none">
+                            <path d="M12 24l8 8 16-16" stroke="#0066ff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="24" cy="24" r="20" stroke="#0066ff" stroke-width="2" opacity="0.3"/>
+                        </svg>
+                    </div>
+                    <h3>Resolved</h3>
+                    <p>A binding verdict is issued. Smart contract escrow releases funds to the prevailing party. Transparent, final, fair.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Use Cases -->
+    <section class="use-cases" id="use-cases">
+        <div class="container">
+            <div class="use-cases-header reveal">
+                <span class="section-label">Use Cases</span>
+                <h2 class="section-title">Any dispute. Any scale.</h2>
+                <p class="section-subtitle">From freelancer payment disputes to multi-party DAO governance conflicts.</p>
+            </div>
+            <div class="cases-grid">
+                <div class="case-card reveal">
+                    <span class="case-icon">&#9878;</span>
+                    <h3>Freelance & Gig Economy</h3>
+                    <p>Client won't pay? Deliverable contested? Submit the contract and work product. Get a binding verdict in minutes, not months of back-and-forth.</p>
+                </div>
+                <div class="case-card reveal">
+                    <span class="case-icon">&#128279;</span>
+                    <h3>Smart Contract Disputes</h3>
+                    <p>When code execution and contract intent diverge, Veritas interprets the original agreement and renders a fair outcome on-chain.</p>
+                </div>
+                <div class="case-card reveal">
+                    <span class="case-icon">&#127758;</span>
+                    <h3>Cross-Border Commerce</h3>
+                    <p>International trade disputes with no clear jurisdiction. Veritas provides a neutral, borderless arbitration layer that both parties can trust.</p>
+                </div>
+                <div class="case-card reveal">
+                    <span class="case-icon">&#127970;</span>
+                    <h3>DAO Governance</h3>
+                    <p>Resolve treasury allocation conflicts, contributor disputes, and governance deadlocks with transparent, consensus-driven arbitration.</p>
+                </div>
+                <div class="case-card reveal">
+                    <span class="case-icon">&#128176;</span>
+                    <h3>DeFi & Lending</h3>
+                    <p>Collateral disputes, liquidation disagreements, and protocol-level conflicts resolved fairly and automatically through AI consensus.</p>
+                </div>
+                <div class="case-card reveal">
+                    <span class="case-icon">&#128220;</span>
+                    <h3>Insurance Claims</h3>
+                    <p>Parametric insurance disputes where conditions are ambiguous. AI validators assess evidence and policy language to reach fair settlements.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trust & Security -->
+    <section class="trust" id="trust">
+        <div class="container">
+            <div class="reveal">
+                <span class="section-label">Trust & Security</span>
+                <h2 class="section-title">Trust the process,<br>not a person.</h2>
+                <p class="section-subtitle">Every safeguard is mathematical, not institutional.</p>
+            </div>
+            <div class="trust-grid">
+                <div class="trust-features reveal">
+                    <div class="trust-feature">
+                        <div class="trust-icon">
+                            <svg viewBox="0 0 22 22" fill="none"><path d="M11 2L3 6v5c0 5.55 3.84 10.74 8 12 4.16-1.26 8-6.45 8-12V6l-8-4z" stroke="#0066ff" stroke-width="1.5" fill="none"/></svg>
+                        </div>
+                        <div>
+                            <h4>Immutable Evidence</h4>
+                            <p>All submissions are hashed and stored on-chain. No party can alter evidence after filing.</p>
+                        </div>
+                    </div>
+                    <div class="trust-feature">
+                        <div class="trust-icon">
+                            <svg viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="9" stroke="#0066ff" stroke-width="1.5"/><path d="M11 6v5l4 2" stroke="#0066ff" stroke-width="1.5" stroke-linecap="round"/></svg>
+                        </div>
+                        <div>
+                            <h4>Multi-Validator Consensus</h4>
+                            <p>Multiple AI agents reason independently. Collusion is mathematically impossible when validators can't coordinate.</p>
+                        </div>
+                    </div>
+                    <div class="trust-feature">
+                        <div class="trust-icon">
+                            <svg viewBox="0 0 22 22" fill="none"><rect x="3" y="9" width="16" height="10" rx="2" stroke="#0066ff" stroke-width="1.5"/><path d="M7 9V6a4 4 0 018 0v3" stroke="#0066ff" stroke-width="1.5" fill="none"/><circle cx="11" cy="14" r="1.5" fill="#0066ff"/></svg>
+                        </div>
+                        <div>
+                            <h4>Escrow-Protected</h4>
+                            <p>Funds are locked in smart contract escrow before deliberation begins. The verdict triggers automatic, trustless release.</p>
+                        </div>
+                    </div>
+                    <div class="trust-feature">
+                        <div class="trust-icon">
+                            <svg viewBox="0 0 22 22" fill="none"><path d="M4 11a7 7 0 0114 0M11 4v1M4 11h1M17 11h1M6.5 6.5l.7.7M15.5 6.5l-.7.7" stroke="#0066ff" stroke-width="1.5" stroke-linecap="round"/><circle cx="11" cy="11" r="2" fill="#0066ff"/></svg>
+                        </div>
+                        <div>
+                            <h4>Fully Transparent</h4>
+                            <p>Every step of the reasoning process is recorded on-chain. Audit the logic, verify the verdict, trust the outcome.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="trust-visual reveal">
+                    <div class="trust-graphic">
+                        <div class="trust-center-icon">
+                            <svg viewBox="0 0 36 36" fill="none">
+                                <path d="M18 3L5 9v8c0 8.33 5.76 16.11 13 18 7.24-1.89 13-9.67 13-18V9L18 3z" stroke="#0066ff" stroke-width="2" fill="rgba(0,102,255,0.1)"/>
+                                <path d="M13 18l3 3 7-7" stroke="#0066ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta" id="cta">
+        <div class="container">
+            <div class="cta-content reveal">
+                <span class="section-label">Start Now</span>
+                <h2>Disputes shouldn't<br>bankrupt you.</h2>
+                <p>Veritas is live on GenLayer Testnet Bradbury. File your first dispute and experience justice at the speed of consensus.</p>
+                <div class="cta-buttons">
+                    <a href="#" class="btn-primary">
+                        <span>Launch App</span>
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </a>
+                    <a href="https://github.com" target="_blank" class="btn-secondary">
+                        <span>View on GitHub</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">Veritas</div>
+                <ul class="footer-links">
+                    <li><a href="#problem">Problem</a></li>
+                    <li><a href="#how-it-works">How It Works</a></li>
+                    <li><a href="#use-cases">Use Cases</a></li>
+                    <li><a href="#trust">Security</a></li>
+                </ul>
+            </div>
+            <div class="footer-bottom">
+                <p>Built for the GenLayer Testnet Bradbury Hackathon on DoraHacks</p>
+                <p class="powered-by">Powered by <a href="https://genlayer.com" target="_blank">GenLayer</a> AI-Consensus Blockchain</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ============ PARTICLE BACKGROUND ============
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let mouse = { x: null, y: null };
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedX = (Math.random() - 0.5) * 0.3;
+                this.speedY = (Math.random() - 0.5) * 0.3;
+                this.opacity = Math.random() * 0.4 + 0.1;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(0, 102, 255, ${this.opacity})`;
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            const count = Math.min(80, Math.floor((canvas.width * canvas.height) / 15000));
+            particles = [];
+            for (let i = 0; i < count; i++) {
+                particles.push(new Particle());
+            }
+        }
+        initParticles();
+
+        function connectParticles() {
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 150) {
+                        const opacity = (1 - dist / 150) * 0.12;
+                        ctx.beginPath();
+                        ctx.strokeStyle = `rgba(0, 102, 255, ${opacity})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            connectParticles();
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+
+        // ============ NAVBAR SCROLL ============
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // ============ MOBILE MENU ============
+        const mobileBtn = document.getElementById('mobile-menu-btn');
+        const navLinks = document.getElementById('nav-links');
+        mobileBtn.addEventListener('click', () => {
+            navLinks.classList.toggle('open');
+        });
+        navLinks.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                navLinks.classList.remove('open');
+            });
+        });
+
+        // ============ SCROLL REVEAL ============
+        const revealElements = document.querySelectorAll('.reveal');
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+        revealElements.forEach(el => revealObserver.observe(el));
+
+        // ============ SMOOTH SCROLL ============
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

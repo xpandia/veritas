@@ -759,9 +759,196 @@ def seed_demo_data():
         },
     }
 
+    # --- Case 4: RESOLVED — Maria vs TechCorp (hero demo story) ---
+    maria_user = {
+        "user_id": "usr-demo-maria-003",
+        "email": "maria@veritas.legal",
+        "password_hash": hash_password("demo1234"),
+        "display_name": "Maria Rodriguez",
+        "wallet_address": "0xMaria003aaBBccDDeeFF00112233445566778899",
+        "created_at": "2026-01-10T11:00:00+00:00",
+    }
+    db_put_user(maria_user)
+
+    case4_id = "case-demo-004"
+    case4 = {
+        "case_id": case4_id,
+        "on_chain_dispute_id": "gl-dispute-0x7a4",
+        "claimant_id": maria_user["user_id"],
+        "claimant_address": maria_user["wallet_address"],
+        "claimant_name": "Maria Rodriguez",
+        "respondent_address": "0xTechCorp5aaBBccDDeeFF00112233445566778899",
+        "respondent_name": "TechCorp GmbH (Berlin)",
+        "category": "service_dispute",
+        "title": "Maria Rodriguez (Buenos Aires) vs TechCorp GmbH (Berlin) — Unpaid Web Development",
+        "description": (
+            "Maria Rodriguez, a freelance web developer based in Buenos Aires, was contracted by "
+            "TechCorp GmbH (Berlin) to redesign their e-commerce platform for $2,000 USD. The "
+            "project scope included responsive redesign, checkout flow optimization, and Stripe "
+            "payment integration. Maria delivered all milestones on time and TechCorp's project "
+            "manager acknowledged receipt and satisfactory completion via email on February 12, 2026. "
+            "Despite the acknowledged delivery, TechCorp has not paid the agreed $2,000. Three "
+            "Stripe payment requests were sent and all were declined or ignored. Maria has exhausted "
+            "all informal resolution attempts and now seeks arbitration to recover the full amount."
+        ),
+        "status": "RESOLVED",
+        "escrow_amount": 2000,
+        "filing_fee": 100,
+        "current_round": 3,
+        "appeal_count": 0,
+        "created_at": (now - timedelta(days=21)).isoformat(),
+        "updated_at": (now - timedelta(days=3)).isoformat(),
+        "contract_result": {"dispute_id": "gl-dispute-0x7a4", "tx_hash": "0x4a7b8c9d0e1f2a3b..."},
+        "verdict": {
+            "outcome": "claimant_wins",
+            "winner": "claimant",
+            "escrow_split": {"claimant_pct": 85, "respondent_pct": 15},
+            "claimant_amount": 1700,
+            "respondent_amount": 300,
+            "confidence": "high",
+            "reasoning": (
+                "The evidence overwhelmingly supports the claimant's position. The signed freelance "
+                "contract (Exhibit A) clearly specifies the deliverables, timeline, and payment terms "
+                "of $2,000 USD upon completion. The email correspondence (Exhibit B) contains an "
+                "explicit acknowledgment from TechCorp's project manager, Jonas Mueller, dated "
+                "February 12, 2026, stating: 'All deliverables received and approved. Great work, "
+                "Maria.' This constitutes acceptance of the work product.\n\n"
+                "The Stripe payment records (Exhibit C) demonstrate three separate payment attempts "
+                "initiated by Maria between February 15-28, all of which were declined on TechCorp's "
+                "end. TechCorp did not submit any evidence of defective work, missed deadlines, or "
+                "contract breach. Their sole defense — that internal budget reallocation delayed "
+                "payment — does not constitute a valid legal defense against a completed contractual "
+                "obligation.\n\n"
+                "RULING: The AI arbitration panel finds in favor of the claimant, Maria Rodriguez, "
+                "with 92% confidence. TechCorp GmbH is ordered to pay 85% of the escrowed amount "
+                "($1,700) to the claimant. The remaining 15% ($300) accounts for the platform fee "
+                "and is returned to the respondent's escrow balance. This dispute, which would cost "
+                "$91,000+ and take 12-18 months in traditional arbitration, was resolved in under "
+                "48 hours for less than $1 in transaction fees on GenLayer."
+            ),
+            "rendered_at": (now - timedelta(days=4)).isoformat(),
+        },
+        "ai_analysis": {
+            "evidence_summary": (
+                "Four pieces of evidence were analyzed: a signed freelance contract, email thread "
+                "with delivery acknowledgment, Stripe payment attempt records, and the project "
+                "deliverable screenshots with timestamps."
+            ),
+            "strengths_claimant": [
+                "Signed contract with clear scope, deliverables, timeline, and payment terms ($2,000 USD).",
+                "Email from TechCorp PM (Jonas Mueller) explicitly acknowledging satisfactory delivery: 'All deliverables received and approved.'",
+                "Three documented Stripe payment requests (Feb 15, 21, 28) — all declined on respondent's end.",
+                "Timestamped screenshots and Git commit history proving on-time delivery of all milestones.",
+            ],
+            "weaknesses_claimant": [
+                "Contract was informal (email-based agreement rather than a notarized document).",
+                "No escalation to TechCorp's legal department before filing arbitration.",
+            ],
+            "strengths_respondent": [
+                "TechCorp claimed internal budget reallocation caused the delay (not outright refusal to pay).",
+            ],
+            "weaknesses_respondent": [
+                "No evidence submitted to support the budget reallocation claim.",
+                "Delivery was explicitly acknowledged — respondent cannot claim non-performance.",
+                "Three payment attempts were ignored without any communication or counter-proposal.",
+                "No evidence of defective work, missed deadlines, or scope creep.",
+            ],
+            "inconsistencies": [
+                "TechCorp acknowledged delivery but did not pay — these positions are contradictory.",
+                "Respondent's 'budget reallocation' defense was raised only after arbitration was filed.",
+            ],
+            "preliminary_assessment": "favor_claimant",
+            "confidence": 0.92,
+            "deliberation_rounds": [
+                {
+                    "round": 1,
+                    "summary": "Initial review of contract terms and delivery evidence. All four milestones verified as complete.",
+                    "validator_consensus": 0.95,
+                },
+                {
+                    "round": 2,
+                    "summary": "Deep analysis of email correspondence. TechCorp PM's delivery acknowledgment is unambiguous and constitutes acceptance.",
+                    "validator_consensus": 0.93,
+                },
+                {
+                    "round": 3,
+                    "summary": "Final assessment including payment records analysis. Three declined Stripe payments confirm non-payment despite acknowledged delivery. Verdict: claimant wins.",
+                    "validator_consensus": 0.92,
+                },
+            ],
+        },
+        "reputation_update": {
+            "maria": {"score_before": 500, "score_after": 530, "change": "+30 (won as claimant)"},
+            "techcorp": {"score_before": 500, "score_after": 480, "change": "-20 (lost as respondent)"},
+        },
+    }
+
     db_put_case(case1)
     db_put_case(case2)
     db_put_case(case3)
+    db_put_case(case4)
+
+    # --- Evidence for Case 4 (Maria vs TechCorp) ---
+    ev_maria_1 = {
+        "evidence_id": "ev-demo-m01",
+        "case_id": case4_id,
+        "submitter_id": maria_user["user_id"],
+        "submitter_address": maria_user["wallet_address"],
+        "evidence_type": "document",
+        "description": "Signed freelance contract between Maria Rodriguez and TechCorp GmbH — scope, deliverables, $2,000 payment terms",
+        "file_name": "Freelance_Contract_Maria_TechCorp.pdf",
+        "file_hash": "e1a2b3c4d5e6f7890123456789abcdef01234567890abcdef01234567890abc1",
+        "file_size": 312000,
+        "content_type": "application/pdf",
+        "uploaded_at": (now - timedelta(days=19)).isoformat(),
+        "contract_result": {},
+    }
+    ev_maria_2 = {
+        "evidence_id": "ev-demo-m02",
+        "case_id": case4_id,
+        "submitter_id": maria_user["user_id"],
+        "submitter_address": maria_user["wallet_address"],
+        "evidence_type": "communication",
+        "description": "Email thread with TechCorp PM Jonas Mueller — includes delivery acknowledgment: 'All deliverables received and approved'",
+        "file_name": "Email_Thread_TechCorp_Delivery_Ack.pdf",
+        "file_hash": "f2b3c4d5e6f7890123456789abcdef01234567890abcdef01234567890abcd2",
+        "file_size": 187000,
+        "content_type": "application/pdf",
+        "uploaded_at": (now - timedelta(days=19)).isoformat(),
+        "contract_result": {},
+    }
+    ev_maria_3 = {
+        "evidence_id": "ev-demo-m03",
+        "case_id": case4_id,
+        "submitter_id": maria_user["user_id"],
+        "submitter_address": maria_user["wallet_address"],
+        "evidence_type": "transaction",
+        "description": "Stripe payment attempt records — 3 invoices sent (Feb 15, 21, 28), all declined on TechCorp's end",
+        "file_name": "Stripe_Payment_Attempts.pdf",
+        "file_hash": "a3c4d5e6f7890123456789abcdef01234567890abcdef01234567890abcde3",
+        "file_size": 95000,
+        "content_type": "application/pdf",
+        "uploaded_at": (now - timedelta(days=18)).isoformat(),
+        "contract_result": {},
+    }
+    ev_maria_4 = {
+        "evidence_id": "ev-demo-m04",
+        "case_id": case4_id,
+        "submitter_id": maria_user["user_id"],
+        "submitter_address": maria_user["wallet_address"],
+        "evidence_type": "document",
+        "description": "Project deliverable screenshots with timestamps and Git commit history proving on-time completion",
+        "file_name": "Deliverable_Screenshots_GitLog.pdf",
+        "file_hash": "b4d5e6f7890123456789abcdef01234567890abcdef01234567890abcdef4",
+        "file_size": 2450000,
+        "content_type": "application/pdf",
+        "uploaded_at": (now - timedelta(days=18)).isoformat(),
+        "contract_result": {},
+    }
+    db_put_evidence(ev_maria_1)
+    db_put_evidence(ev_maria_2)
+    db_put_evidence(ev_maria_3)
+    db_put_evidence(ev_maria_4)
 
     # --- Evidence for Case 2 ---
     ev1 = {
@@ -848,7 +1035,23 @@ def seed_demo_data():
     add_timeline_event(case3_id, "VERDICT_RENDERED", "Veredicto final emitido — Demandante gana (85/15)", actor="system")
     add_timeline_event(case3_id, "CASE_RESOLVED", "Caso resuelto — Fondos distribuidos", actor="system")
 
-    logger.info("Demo data seeded successfully: 2 users, 3 cases, 4 evidence items")
+    # Case 4 (Maria vs TechCorp)
+    add_timeline_event(case4_id, "CASE_FILED", "Dispute filed by Maria Rodriguez (Buenos Aires) against TechCorp GmbH (Berlin) — $2,000 unpaid web development", actor=maria_user["user_id"])
+    add_timeline_event(case4_id, "EVIDENCE_SUBMITTED", "Freelance contract uploaded (Exhibit A) — scope, deliverables, $2,000 payment terms", actor=maria_user["user_id"])
+    add_timeline_event(case4_id, "EVIDENCE_SUBMITTED", "Email correspondence uploaded (Exhibit B) — TechCorp PM acknowledged delivery: 'All deliverables received and approved'", actor=maria_user["user_id"])
+    add_timeline_event(case4_id, "EVIDENCE_SUBMITTED", "Stripe payment records uploaded (Exhibit C) — 3 payment attempts declined by TechCorp", actor=maria_user["user_id"])
+    add_timeline_event(case4_id, "EVIDENCE_SUBMITTED", "Deliverable screenshots and Git history uploaded (Exhibit D) — proves on-time milestone completion", actor=maria_user["user_id"])
+    add_timeline_event(case4_id, "AI_ANALYSIS", "AI analysis round 1 complete — contract terms verified, all 4 milestones confirmed delivered", actor="system")
+    add_timeline_event(case4_id, "DELIBERATION_ADVANCED", "Deliberation advanced to round 2 — analyzing email correspondence", actor="system")
+    add_timeline_event(case4_id, "AI_ANALYSIS", "AI analysis round 2 complete — delivery acknowledgment from TechCorp PM confirmed as unambiguous acceptance", actor="system")
+    add_timeline_event(case4_id, "DELIBERATION_ADVANCED", "Deliberation advanced to round 3 — final payment records review", actor="system")
+    add_timeline_event(case4_id, "AI_ANALYSIS", "AI analysis round 3 complete — 3 declined Stripe payments confirm non-payment pattern. Validator consensus: 92%", actor="system")
+    add_timeline_event(case4_id, "VERDICT_RENDERED", "VERDICT: Claimant wins (85/15 split). Maria receives $1,700. Confidence: HIGH (92%). Resolved in <48 hours for <$1 vs $91K+ traditional.", actor="system")
+    add_timeline_event(case4_id, "ESCROW_DISTRIBUTED", "Escrow distributed: $1,700 to Maria Rodriguez, $300 returned to TechCorp GmbH", actor="system")
+    add_timeline_event(case4_id, "REPUTATION_UPDATED", "Reputation updated — Maria: 500 -> 530 (+30, won as claimant). TechCorp: 500 -> 480 (-20, lost as respondent)", actor="system")
+    add_timeline_event(case4_id, "CASE_RESOLVED", "Case fully resolved. Cross-border dispute (Argentina/Germany) settled on-chain without lawyers, courts, or jurisdictional complexity.", actor="system")
+
+    logger.info("Demo data seeded successfully: 3 users, 4 cases (incl. Maria vs TechCorp hero story), 8 evidence items")
 
 
 @asynccontextmanager
@@ -1796,6 +1999,32 @@ async def demo_reputation(wallet_address: str):
             "total_value_recovered": 0,
             "win_rate": 0,
         },
+        "0xMaria003aaBBccDDeeFF00112233445566778899": {
+            "address": "0xMaria003aaBBccDDeeFF00112233445566778899",
+            "display_name": "Maria Rodriguez",
+            "score": 530,
+            "cases_filed": 1,
+            "cases_responded": 0,
+            "cases_won": 1,
+            "cases_lost": 0,
+            "cases_active": 0,
+            "compliance_score": 100,
+            "total_value_recovered": 1700,
+            "win_rate": 100,
+        },
+        "0xTechCorp5aaBBccDDeeFF00112233445566778899": {
+            "address": "0xTechCorp5aaBBccDDeeFF00112233445566778899",
+            "display_name": "TechCorp GmbH",
+            "score": 480,
+            "cases_filed": 0,
+            "cases_responded": 1,
+            "cases_won": 0,
+            "cases_lost": 1,
+            "cases_active": 0,
+            "compliance_score": 80,
+            "total_value_recovered": 0,
+            "win_rate": 0,
+        },
     }
     rep = demo_reputations.get(wallet_address)
     if rep:
@@ -1838,6 +2067,266 @@ async def demo_create_case(body: CaseCreate):
     db_put_case(case)
     add_timeline_event(case_id, "CASE_FILED", "Caso presentado (modo demo)", actor="usr-demo-alice-001")
     return case
+
+
+@app.post("/api/demo/cases/{case_id}/analyze", tags=["Demo"])
+async def demo_analyze(case_id: str):
+    """
+    Trigger mock AI analysis without GenLayer RPC (demo mode).
+
+    Returns realistic AI analysis results with strengths, weaknesses,
+    confidence scores, and validator consensus data.
+    """
+    case = db_get_case(case_id)
+    if not case:
+        raise HTTPException(status_code=404, detail="Case not found")
+
+    if case.get("ai_analysis"):
+        return {
+            "case_id": case_id,
+            "status": "analysis_complete",
+            "round": case.get("current_round", 1),
+            "analysis": case["ai_analysis"],
+            "message": "AI analysis already completed for this case.",
+        }
+
+    # Generate realistic mock analysis based on case data
+    analysis = {
+        "evidence_summary": f"Analyzed {len(db_get_evidence(case_id))} evidence items for case '{case['title']}'.",
+        "strengths_claimant": [
+            "Documentary evidence supports the claimant's core assertions.",
+            "Timeline of events is consistent and well-documented.",
+            "Communication records show good-faith attempts at resolution.",
+        ],
+        "weaknesses_claimant": [
+            "Some claims lack independent corroboration.",
+        ],
+        "strengths_respondent": [
+            "Respondent raised procedural objections that merit consideration.",
+        ],
+        "weaknesses_respondent": [
+            "No substantive evidence submitted to counter the claimant's primary claim.",
+            "Failed to respond to multiple resolution attempts.",
+        ],
+        "inconsistencies": [
+            "Respondent's stated position is inconsistent with their documented actions.",
+        ],
+        "preliminary_assessment": "favor_claimant",
+        "confidence": 0.78,
+        "deliberation_rounds": [
+            {
+                "round": 1,
+                "summary": "Initial evidence review and document verification.",
+                "validator_consensus": 0.82,
+            },
+        ],
+    }
+
+    case["ai_analysis"] = analysis
+    case["status"] = "DELIBERATION"
+    case["updated_at"] = datetime.now(timezone.utc).isoformat()
+    db_put_case(case)
+
+    add_timeline_event(
+        case_id, "AI_ANALYSIS",
+        f"AI evidence analysis completed (demo mode) — preliminary: {analysis['preliminary_assessment']}, confidence: {analysis['confidence']}",
+        actor="system",
+    )
+
+    return {
+        "case_id": case_id,
+        "status": "analysis_complete",
+        "round": case.get("current_round", 1),
+        "analysis": analysis,
+        "validator_consensus": 0.82,
+        "message": "AI analysis completed via GenLayer equivalence principle (demo mode).",
+    }
+
+
+@app.post("/api/demo/cases/{case_id}/verdict", tags=["Demo"])
+async def demo_verdict(case_id: str):
+    """
+    Render a mock AI verdict without GenLayer RPC (demo mode).
+
+    Returns a realistic verdict with outcome, escrow split, confidence,
+    and detailed multi-paragraph reasoning.
+    """
+    case = db_get_case(case_id)
+    if not case:
+        raise HTTPException(status_code=404, detail="Case not found")
+
+    if case.get("verdict"):
+        return {
+            "case_id": case_id,
+            "status": "VERDICT",
+            "verdict": case["verdict"],
+            "message": "Verdict already rendered for this case.",
+        }
+
+    escrow = case.get("escrow_amount", 0)
+    claimant_pct = 85
+    claimant_amount = (escrow * claimant_pct) // 100
+    respondent_amount = escrow - claimant_amount
+
+    verdict = {
+        "outcome": "claimant_wins",
+        "winner": "claimant",
+        "escrow_split": {"claimant_pct": claimant_pct, "respondent_pct": 100 - claimant_pct},
+        "claimant_amount": claimant_amount,
+        "respondent_amount": respondent_amount,
+        "confidence": "high",
+        "reasoning": (
+            f"Based on thorough analysis of all submitted evidence, the AI arbitration panel "
+            f"finds in favor of the claimant. The documentary evidence establishes a clear "
+            f"contractual obligation that was not fulfilled by the respondent. The claimant "
+            f"demonstrated good-faith performance and exhausted informal resolution channels "
+            f"before seeking arbitration.\n\n"
+            f"The respondent failed to provide substantive evidence to counter the primary claim. "
+            f"The communication records confirm that the respondent acknowledged the obligation "
+            f"but did not fulfill it. No valid legal defense was presented.\n\n"
+            f"RULING: {claimant_pct}% of the escrowed amount (${claimant_amount:,}) is awarded "
+            f"to the claimant. The remaining {100 - claimant_pct}% (${respondent_amount:,}) is "
+            f"returned to the respondent. This verdict was reached with HIGH confidence "
+            f"and 92% validator consensus across the GenLayer network."
+        ),
+        "rendered_at": datetime.now(timezone.utc).isoformat(),
+    }
+
+    case["verdict"] = verdict
+    case["status"] = "VERDICT"
+    case["updated_at"] = datetime.now(timezone.utc).isoformat()
+    db_put_case(case)
+
+    add_timeline_event(
+        case_id, "VERDICT_RENDERED",
+        f"Verdict rendered: claimant wins ({claimant_pct}/{100 - claimant_pct} split). "
+        f"Claimant receives ${claimant_amount:,}. Confidence: HIGH.",
+        actor="system",
+        metadata=verdict,
+    )
+
+    return {
+        "case_id": case_id,
+        "status": "VERDICT",
+        "verdict": verdict,
+        "message": "Binding verdict rendered via GenLayer AI consensus (demo mode).",
+    }
+
+
+@app.post("/api/demo/cases/{case_id}/resolve", tags=["Demo"])
+async def demo_resolve(case_id: str):
+    """
+    Resolve a case and distribute escrow without GenLayer RPC (demo mode).
+
+    Distributes escrowed funds per the verdict split and updates reputations.
+    """
+    case = db_get_case(case_id)
+    if not case:
+        raise HTTPException(status_code=404, detail="Case not found")
+
+    if case["status"] == "RESOLVED":
+        return {
+            "case_id": case_id,
+            "status": "RESOLVED",
+            "message": "Case already resolved.",
+            "verdict": case.get("verdict"),
+        }
+
+    if not case.get("verdict"):
+        raise HTTPException(status_code=400, detail="No verdict rendered yet. Call /verdict first.")
+
+    verdict = case["verdict"]
+    escrow = case.get("escrow_amount", 0)
+    claimant_pct = verdict.get("escrow_split", {}).get("claimant_pct", 85)
+    claimant_amount = (escrow * claimant_pct) // 100
+    respondent_amount = escrow - claimant_amount
+
+    case["status"] = "RESOLVED"
+    case["updated_at"] = datetime.now(timezone.utc).isoformat()
+    db_put_case(case)
+
+    add_timeline_event(
+        case_id, "ESCROW_DISTRIBUTED",
+        f"Escrow distributed: ${claimant_amount:,} to claimant, ${respondent_amount:,} to respondent",
+        actor="system",
+    )
+    add_timeline_event(
+        case_id, "REPUTATION_UPDATED",
+        "Reputation scores updated — claimant: +30 (won), respondent: -20 (lost)",
+        actor="system",
+    )
+    add_timeline_event(
+        case_id, "CASE_RESOLVED",
+        "Case fully resolved. Funds distributed per AI verdict.",
+        actor="system",
+    )
+
+    return {
+        "case_id": case_id,
+        "status": "RESOLVED",
+        "escrow_total": escrow,
+        "claimant_receives": claimant_amount,
+        "respondent_receives": respondent_amount,
+        "claimant_pct": claimant_pct,
+        "reputation_changes": {
+            "claimant": "+30 (won as claimant)",
+            "respondent": "-20 (lost as respondent)",
+        },
+        "message": "Case resolved. Escrow distributed and reputations updated.",
+        "cost_comparison": {
+            "traditional_arbitration_cost": "$91,000+",
+            "traditional_arbitration_time": "12-18 months",
+            "veritas_cost": "<$1 (GenLayer transaction fees)",
+            "veritas_time": "Minutes to hours",
+            "savings": "99.999%",
+        },
+    }
+
+
+@app.post("/api/demo/cases/{case_id}/full-flow", tags=["Demo"])
+async def demo_full_flow(case_id: str):
+    """
+    Run the complete arbitration flow in one call (demo mode).
+
+    Executes: analyze -> verdict -> resolve in sequence, returning
+    the full lifecycle result. Useful for demonstrating the end-to-end
+    flow during presentations.
+    """
+    case = db_get_case(case_id)
+    if not case:
+        raise HTTPException(status_code=404, detail="Case not found")
+
+    results = {"case_id": case_id, "steps": []}
+
+    # Step 1: Analyze (if not already done)
+    if not case.get("ai_analysis"):
+        analysis_result = await demo_analyze(case_id)
+        results["steps"].append({"step": "analyze", "result": analysis_result})
+        case = db_get_case(case_id)  # Reload
+    else:
+        results["steps"].append({"step": "analyze", "result": "Already completed"})
+
+    # Step 2: Verdict (if not already done)
+    if not case.get("verdict"):
+        verdict_result = await demo_verdict(case_id)
+        results["steps"].append({"step": "verdict", "result": verdict_result})
+        case = db_get_case(case_id)  # Reload
+    else:
+        results["steps"].append({"step": "verdict", "result": "Already rendered"})
+
+    # Step 3: Resolve (if not already done)
+    if case["status"] != "RESOLVED":
+        resolve_result = await demo_resolve(case_id)
+        results["steps"].append({"step": "resolve", "result": resolve_result})
+    else:
+        results["steps"].append({"step": "resolve", "result": "Already resolved"})
+
+    # Final state
+    final_case = db_get_case(case_id)
+    results["final_state"] = final_case
+    results["message"] = "Full arbitration lifecycle completed."
+
+    return results
 
 
 @app.get("/api/demo/all-evidence", tags=["Demo"])

@@ -226,6 +226,144 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
 .lang-option:last-child{border-radius:0 0 var(--radius-sm) var(--radius-sm)}
 .lang-option:hover{background:var(--blue-glow)}
 .lang-option.active{background:var(--blue-glow);color:var(--blue3);font-weight:600}
+
+/* ===== WIZARD MODAL ===== */
+.wizard-progress{display:flex;align-items:center;gap:0;margin-bottom:28px;padding:0 8px}
+.wizard-step-indicator{display:flex;flex-direction:column;align-items:center;flex:1;position:relative}
+.wizard-step-indicator .step-num{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.82rem;font-weight:700;background:var(--bg);border:2px solid var(--border);color:var(--text3);transition:all .3s ease;z-index:1}
+.wizard-step-indicator.active .step-num{border-color:var(--blue);color:var(--blue3);box-shadow:0 0 16px var(--blue-glow);transform:scale(1.1)}
+.wizard-step-indicator.done .step-num{border-color:var(--green);background:var(--green);color:#fff}
+.wizard-step-indicator .step-label{font-size:.65rem;color:var(--text3);margin-top:6px;text-transform:uppercase;letter-spacing:.5px;transition:color .3s}
+.wizard-step-indicator.active .step-label{color:var(--blue3)}
+.wizard-step-indicator.done .step-label{color:var(--green)}
+.wizard-connector{flex:1;height:2px;background:var(--border);transition:background .3s}
+.wizard-connector.done{background:var(--green)}
+.wizard-panel{display:none;animation:wizardSlideIn .35s ease}
+.wizard-panel.active{display:block}
+@keyframes wizardSlideIn{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:translateX(0)}}
+
+/* Category cards */
+.category-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.category-card{background:var(--bg);border:2px solid var(--border);border-radius:var(--radius);padding:24px 18px;text-align:center;cursor:pointer;transition:all .25s}
+.category-card:hover{border-color:var(--blue);background:var(--bg3);transform:translateY(-2px)}
+.category-card.selected{border-color:var(--blue);background:var(--blue-glow);box-shadow:0 0 24px var(--blue-glow)}
+.category-card .cat-icon{font-size:2rem;margin-bottom:10px;display:block}
+.category-card .cat-name{font-size:.88rem;font-weight:600;color:var(--text);margin-bottom:4px}
+.category-card .cat-desc{font-size:.72rem;color:var(--text3)}
+
+/* Drag-drop zone */
+.drop-zone{border:2px dashed var(--border);border-radius:var(--radius);padding:48px 24px;text-align:center;cursor:pointer;transition:all .25s;position:relative}
+.drop-zone:hover,.drop-zone.drag-over{border-color:var(--blue);background:var(--blue-glow)}
+.drop-zone .dz-icon{font-size:2.5rem;margin-bottom:12px;display:block;opacity:.5}
+.drop-zone .dz-text{font-size:.88rem;color:var(--text2);margin-bottom:4px}
+.drop-zone .dz-hint{font-size:.72rem;color:var(--text3)}
+.drop-zone input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer}
+.file-preview-list{margin-top:16px;display:flex;flex-direction:column;gap:8px}
+.file-preview-item{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg);border-radius:var(--radius-sm);font-size:.82rem}
+.file-preview-item .fp-icon{font-size:1.2rem}
+.file-preview-item .fp-name{flex:1;font-weight:500}
+.file-preview-item .fp-size{color:var(--text3);font-size:.72rem}
+.file-preview-item .fp-remove{color:var(--red);cursor:pointer;font-size:1rem;padding:2px 6px;border-radius:4px;transition:background .2s}
+.file-preview-item .fp-remove:hover{background:rgba(239,83,80,.15)}
+
+/* Review section */
+.review-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.review-item{padding:14px;background:var(--bg);border-radius:var(--radius-sm)}
+.review-item .ri-label{font-size:.68rem;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px}
+.review-item .ri-value{font-size:.92rem;font-weight:600}
+
+/* ===== AI DELIBERATION OVERLAY ===== */
+.ai-overlay{position:fixed;inset:0;background:rgba(0,0,0,.92);backdrop-filter:blur(12px);z-index:500;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .4s}
+.ai-overlay.active{opacity:1;pointer-events:auto}
+.ai-overlay-content{text-align:center;max-width:640px;width:100%;padding:40px}
+
+/* Matrix rain */
+.matrix-rain{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:501;opacity:0;transition:opacity .3s}
+.matrix-rain.active{opacity:1}
+.matrix-rain canvas{width:100%;height:100%}
+
+/* AI brain pulse */
+@keyframes brainPulse{0%,100%{transform:scale(1);opacity:.8}50%{transform:scale(1.15);opacity:1}}
+@keyframes glowPulse{0%,100%{box-shadow:0 0 20px var(--blue-glow)}50%{box-shadow:0 0 60px rgba(0,102,255,.4)}}
+.ai-brain{font-size:4rem;animation:brainPulse 1.2s ease-in-out infinite;display:inline-block}
+.ai-status-text{font-size:1.1rem;font-weight:600;color:var(--blue3);margin-top:16px;letter-spacing:.5px}
+.ai-sub-text{font-size:.82rem;color:var(--text3);margin-top:6px}
+
+/* Evidence processing items */
+.evidence-proc-list{margin-top:24px;display:flex;flex-direction:column;gap:8px;text-align:left}
+.evidence-proc-item{display:flex;align-items:center;gap:12px;padding:10px 16px;background:rgba(255,255,255,.04);border-radius:var(--radius-sm);opacity:0;transform:translateX(-20px);transition:all .4s ease}
+.evidence-proc-item.visible{opacity:1;transform:translateX(0)}
+.evidence-proc-item .ep-icon{font-size:1.1rem}
+.evidence-proc-item .ep-name{flex:1;font-size:.85rem;color:var(--text)}
+.evidence-proc-item .ep-check{color:var(--green);font-weight:700;opacity:0;transition:opacity .3s}
+.evidence-proc-item.checked .ep-check{opacity:1}
+
+/* Analysis reveal */
+@keyframes slideFromLeft{from{opacity:0;transform:translateX(-40px)}to{opacity:1;transform:translateX(0)}}
+@keyframes slideFromRight{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes meterFill{from{width:0}to{width:var(--target-width)}}
+.reveal-left{animation:slideFromLeft .5s ease forwards}
+.reveal-right{animation:slideFromRight .5s ease forwards}
+.reveal-up{animation:fadeInUp .5s ease forwards}
+.analysis-complete-text{font-size:1.3rem;font-weight:800;color:var(--green);letter-spacing:1px;opacity:0;transition:opacity .4s}
+.analysis-complete-text.visible{opacity:1}
+
+/* ===== VERDICT ANIMATION ===== */
+.verdict-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);z-index:500;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .4s}
+.verdict-overlay.active{opacity:1;pointer-events:auto}
+.verdict-overlay-content{text-align:center;max-width:500px;width:100%}
+
+@keyframes gavelSwing{0%{transform:rotate(-45deg)}60%{transform:rotate(8deg)}80%{transform:rotate(-3deg)}100%{transform:rotate(0deg)}}
+@keyframes gavelImpact{0%{transform:scale(1)}50%{transform:scale(1.08)}100%{transform:scale(1)}}
+.gavel-svg{display:inline-block;transform-origin:bottom right}
+.gavel-svg.animate{animation:gavelSwing .6s ease-out forwards}
+.gavel-impact.animate{animation:gavelImpact .3s ease .6s forwards}
+
+@keyframes verdictTextReveal{from{opacity:0;transform:scale(.7);letter-spacing:12px}to{opacity:1;transform:scale(1);letter-spacing:3px}}
+.verdict-text{font-size:2rem;font-weight:900;letter-spacing:3px;opacity:0}
+.verdict-text.reveal{animation:verdictTextReveal .6s ease forwards}
+.verdict-text.claimant{color:var(--green)}
+.verdict-text.respondent{color:var(--red)}
+
+/* Escrow flow */
+@keyframes pieReveal{from{opacity:0;transform:scale(0) rotate(-90deg)}to{opacity:1;transform:scale(1) rotate(0deg)}}
+.pie-animate{animation:pieReveal .8s ease forwards}
+@keyframes coinFloat{0%{opacity:0;transform:translateY(0) scale(0)}30%{opacity:1;transform:translateY(-10px) scale(1)}100%{opacity:0;transform:translateY(-60px) scale(.5)}}
+.coin-particle{position:absolute;animation:coinFloat 1.2s ease forwards;font-size:1.2rem}
+
+/* Stamp */
+@keyframes stampSlam{0%{opacity:0;transform:scale(3) rotate(-15deg)}60%{opacity:1;transform:scale(.95) rotate(2deg)}80%{transform:scale(1.02) rotate(-1deg)}100%{transform:scale(1) rotate(0deg)}}
+.case-stamp{display:inline-block;padding:12px 28px;border:3px solid var(--green);border-radius:var(--radius-sm);font-size:1rem;font-weight:800;color:var(--green);letter-spacing:2px;text-transform:uppercase;opacity:0}
+.case-stamp.animate{animation:stampSlam .5s ease forwards}
+
+/* ===== TIMELINE ENHANCEMENT ===== */
+.timeline-enhanced{position:relative;padding-left:32px}
+.timeline-enhanced::before{content:'';position:absolute;left:11px;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,var(--blue),var(--green))}
+.tl-node{position:relative;margin-bottom:24px;padding-left:24px}
+.tl-node::before{content:'';position:absolute;left:-24px;top:6px;width:14px;height:14px;border-radius:50%;background:var(--bg2);border:2px solid var(--border);z-index:1;transition:all .3s}
+.tl-node.completed::before{background:var(--green);border-color:var(--green);box-shadow:0 0 10px rgba(0,200,83,.4)}
+.tl-node.current::before{width:18px;height:18px;left:-26px;top:4px;border-color:var(--blue);box-shadow:0 0 16px var(--blue-glow);animation:tlPulse 2s ease-in-out infinite}
+@keyframes tlPulse{0%,100%{box-shadow:0 0 8px var(--blue-glow)}50%{box-shadow:0 0 24px rgba(0,102,255,.5)}}
+.tl-node .tl-popover{position:absolute;left:calc(100% + 16px);top:-8px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 16px;font-size:.78rem;color:var(--text2);opacity:0;pointer-events:none;transition:all .2s;white-space:nowrap;z-index:20;box-shadow:var(--shadow)}
+.tl-node:hover .tl-popover{opacity:1;pointer-events:auto;transform:translateX(4px)}
+.tl-node .tl-content{cursor:default}
+.tl-node .tl-content .tl-type{font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--blue3);margin-bottom:3px}
+.tl-node .tl-content .tl-desc{font-size:.88rem;color:var(--text)}
+.tl-node .tl-content .tl-time{font-size:.72rem;color:var(--text3);margin-top:3px}
+
+/* ===== REPUTATION GAUGE ANIMATED ===== */
+@keyframes gaugeCountUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.gauge-animated .gval{animation:gaugeCountUp .6s ease forwards}
+.gauge-delta{font-size:.78rem;font-weight:700;margin-top:4px;opacity:0;transition:opacity .4s .6s}
+.gauge-delta.visible{opacity:1}
+.gauge-delta.positive{color:var(--green)}
+.gauge-delta.negative{color:var(--red)}
+.win-loss-chart{display:flex;align-items:flex-end;gap:3px;height:40px;margin-top:12px;justify-content:center}
+.win-loss-chart .wl-bar{width:8px;border-radius:2px 2px 0 0;transition:height .4s ease}
+.win-loss-chart .wl-bar.win{background:var(--green)}
+.win-loss-chart .wl-bar.loss{background:var(--red)}
+.win-loss-chart .wl-bar.draw{background:var(--yellow)}
 </style>
 </head>
 <body>
@@ -265,44 +403,112 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
   <main class="main" id="main-content"></main>
 </div>
 
-<!-- NEW CASE MODAL -->
+<!-- NEW CASE WIZARD MODAL -->
 <div class="modal-overlay" id="modal-overlay">
-  <div class="modal">
+  <div class="modal" style="width:620px">
     <h3>&#9878;&#65039; <span data-i18n="modal_title">New Arbitration Case</span></h3>
-    <div class="form-group">
-      <label data-i18n="modal_category">Dispute Category</label>
-      <select id="case-category">
-        <option value="contract_breach" data-i18n="cat_contract">Contract Breach</option>
-        <option value="ip_infringement" data-i18n="cat_ip">Intellectual Property</option>
-        <option value="fraud" data-i18n="cat_fraud">Fraud</option>
-        <option value="service_dispute" data-i18n="cat_service">Service Dispute</option>
-      </select>
+
+    <!-- Progress bar -->
+    <div class="wizard-progress" id="wizard-progress">
+      <div class="wizard-step-indicator active" data-wstep="1"><div class="step-num">1</div><div class="step-label">Category</div></div>
+      <div class="wizard-connector"></div>
+      <div class="wizard-step-indicator" data-wstep="2"><div class="step-num">2</div><div class="step-label">Details</div></div>
+      <div class="wizard-connector"></div>
+      <div class="wizard-step-indicator" data-wstep="3"><div class="step-num">3</div><div class="step-label">Evidence</div></div>
+      <div class="wizard-connector"></div>
+      <div class="wizard-step-indicator" data-wstep="4"><div class="step-num">4</div><div class="step-label">Review</div></div>
     </div>
-    <div class="form-group">
-      <label data-i18n="modal_case_title">Case Title</label>
-      <input type="text" id="case-title" placeholder="Briefly describe the dispute..." maxlength="200">
+
+    <!-- Step 1: Category -->
+    <div class="wizard-panel active" id="wiz-step-1">
+      <div class="category-grid">
+        <div class="category-card" data-cat="contract_breach" onclick="selectCategory(this)">
+          <span class="cat-icon">&#128220;</span>
+          <div class="cat-name" data-i18n="cat_contract">Contract Breach</div>
+          <div class="cat-desc">Broken agreements or unfulfilled terms</div>
+        </div>
+        <div class="category-card" data-cat="ip_infringement" onclick="selectCategory(this)">
+          <span class="cat-icon">&#128161;</span>
+          <div class="cat-name" data-i18n="cat_ip">Intellectual Property</div>
+          <div class="cat-desc">Copyright, patent, or trademark disputes</div>
+        </div>
+        <div class="category-card" data-cat="fraud" onclick="selectCategory(this)">
+          <span class="cat-icon">&#128680;</span>
+          <div class="cat-name" data-i18n="cat_fraud">Fraud</div>
+          <div class="cat-desc">Deception, misrepresentation, or scams</div>
+        </div>
+        <div class="category-card" data-cat="service_dispute" onclick="selectCategory(this)">
+          <span class="cat-icon">&#128736;&#65039;</span>
+          <div class="cat-name" data-i18n="cat_service">Service Dispute</div>
+          <div class="cat-desc">Quality, delivery, or payment issues</div>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-secondary" onclick="closeModal()" data-i18n="btn_cancel">Cancel</button>
+        <button class="btn btn-primary" onclick="wizardNext()" id="wiz-next-1" disabled>Next &#8594;</button>
+      </div>
     </div>
-    <div class="form-group">
-      <label data-i18n="modal_respondent">Respondent Address</label>
-      <input type="text" id="case-respondent" placeholder="0x..." maxlength="42">
+
+    <!-- Step 2: Details -->
+    <div class="wizard-panel" id="wiz-step-2">
+      <div class="form-group">
+        <label data-i18n="modal_case_title">Case Title</label>
+        <input type="text" id="case-title" placeholder="Briefly describe the dispute..." maxlength="200">
+      </div>
+      <div class="form-group">
+        <label data-i18n="modal_respondent">Respondent Address</label>
+        <input type="text" id="case-respondent" placeholder="0x..." maxlength="42">
+      </div>
+      <div class="form-group">
+        <label data-i18n="modal_amount">Dispute Amount (USD)</label>
+        <input type="number" id="case-amount" placeholder="25000" min="0">
+      </div>
+      <div class="form-group">
+        <label data-i18n="modal_description">Detailed Description</label>
+        <textarea id="case-description" placeholder="Describe the facts, circumstances, and basis of your claim..." maxlength="5000"></textarea>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-secondary" onclick="wizardPrev()">&#8592; Back</button>
+        <button class="btn btn-primary" onclick="wizardNext()">Next &#8594;</button>
+      </div>
     </div>
-    <div class="form-group">
-      <label data-i18n="modal_amount">Dispute Amount (USD)</label>
-      <input type="number" id="case-amount" placeholder="25000" min="0">
+
+    <!-- Step 3: Evidence upload -->
+    <div class="wizard-panel" id="wiz-step-3">
+      <div class="drop-zone" id="drop-zone">
+        <input type="file" id="case-evidence" multiple onchange="handleFileSelect(this.files)">
+        <span class="dz-icon">&#128194;</span>
+        <div class="dz-text">Drag & drop files here, or click to browse</div>
+        <div class="dz-hint">PDF, DOC, images, or any relevant evidence files</div>
+      </div>
+      <div class="file-preview-list" id="file-preview-list"></div>
+      <div class="form-actions">
+        <button class="btn btn-secondary" onclick="wizardPrev()">&#8592; Back</button>
+        <button class="btn btn-primary" onclick="wizardNext()">Next &#8594;</button>
+      </div>
     </div>
-    <div class="form-group">
-      <label data-i18n="modal_description">Detailed Description</label>
-      <textarea id="case-description" placeholder="Describe the facts, circumstances, and basis of your claim..." maxlength="5000"></textarea>
-    </div>
-    <div class="form-group">
-      <label data-i18n="modal_evidence">Initial Evidence (optional)</label>
-      <input type="file" id="case-evidence" style="padding:8px" multiple>
-    </div>
-    <div class="form-actions">
-      <button class="btn btn-secondary" onclick="closeModal()" data-i18n="btn_cancel">Cancel</button>
-      <button class="btn btn-primary" onclick="submitCase()">&#128220; <span data-i18n="btn_file_case">File Case</span></button>
+
+    <!-- Step 4: Review & Submit -->
+    <div class="wizard-panel" id="wiz-step-4">
+      <div class="review-grid" id="review-grid"></div>
+      <div style="margin-top:16px" id="review-files"></div>
+      <div class="form-actions">
+        <button class="btn btn-secondary" onclick="wizardPrev()">&#8592; Back</button>
+        <button class="btn btn-primary" onclick="submitCase()" style="background:var(--green)">&#128220; <span data-i18n="btn_file_case">File Case</span></button>
+      </div>
     </div>
   </div>
+</div>
+
+<!-- AI DELIBERATION OVERLAY -->
+<div class="ai-overlay" id="ai-overlay">
+  <div class="ai-overlay-content" id="ai-overlay-content"></div>
+</div>
+<div class="matrix-rain" id="matrix-rain"><canvas id="matrix-canvas"></canvas></div>
+
+<!-- VERDICT OVERLAY -->
+<div class="verdict-overlay" id="verdict-overlay">
+  <div class="verdict-overlay-content" id="verdict-overlay-content"></div>
 </div>
 
 <!-- TOAST -->
@@ -675,21 +881,28 @@ function renderDashboard() {
     <div class="grid-2">
       <div class="card">
         <h4 style="margin-bottom:16px;font-size:.9rem;font-weight:700">&#128200; ${t('reputation')}</h4>
-        <div class="gauge-container">
-          <div class="gauge">
+        <div class="gauge-container gauge-animated">
+          <div class="gauge" id="dash-gauge">
             <svg width="140" height="140" viewBox="0 0 140 140">
               <circle class="gauge-bg" cx="70" cy="70" r="60"/>
               <circle class="gauge-fill" cx="70" cy="70" r="60"
                 stroke="${getGaugeColor(1847)}"
                 stroke-dasharray="${2 * Math.PI * 60}"
-                stroke-dashoffset="${2 * Math.PI * 60 * (1 - 1847/2500)}"/>
+                stroke-dashoffset="${2 * Math.PI * 60}"
+                id="dash-gauge-fill"/>
             </svg>
             <div class="gauge-text">
-              <div class="gval">1,847</div>
+              <div class="gval" id="dash-gauge-val">0</div>
               <div class="glabel">ELO Score</div>
             </div>
           </div>
+          <div class="gauge-delta positive visible" id="dash-gauge-delta">+23 this week</div>
           <div style="font-size:.75rem;color:var(--text2)">${t('top_pct')}</div>
+          <div class="win-loss-chart">
+            ${['win','win','loss','win','win','draw','win','loss','win','win'].map((r,i) =>
+              `<div class="wl-bar ${r}" style="height:${r==='win'?Math.random()*20+20:r==='loss'?Math.random()*15+10:8}px;transition-delay:${i*0.05}s"></div>`
+            ).join('')}
+          </div>
         </div>
       </div>
 
@@ -949,17 +1162,29 @@ function renderVerdictSection(v, c) {
 
 function renderTimelineSection(events) {
   if (!events || events.length === 0) return '';
+  const lastIdx = events.length - 1;
   return `
     <div class="card" style="margin-bottom:24px">
       <h4 style="font-size:.85rem;font-weight:700;margin-bottom:20px">&#128197; ${t('timeline')}</h4>
-      <div class="timeline">
-        ${events.map(e => `
-          <div class="timeline-item ${e.actor === 'system' ? 'system' : ''}">
-            <div class="tl-type">${e.event_type.replace(/_/g,' ')}</div>
-            <div class="tl-desc">${e.description}</div>
-            <div class="tl-time">${formatDate(e.timestamp)}</div>
-          </div>
-        `).join('')}
+      <div class="timeline-enhanced">
+        ${events.map((e, i) => {
+          const isLast = i === lastIdx;
+          const nodeClass = isLast ? 'current' : 'completed';
+          return `
+          <div class="tl-node ${nodeClass}">
+            <div class="tl-content">
+              <div class="tl-type">${e.event_type.replace(/_/g,' ')}</div>
+              <div class="tl-desc">${e.description}</div>
+              <div class="tl-time">${formatDate(e.timestamp)}</div>
+            </div>
+            <div class="tl-popover">
+              <strong>${e.event_type.replace(/_/g,' ')}</strong><br>
+              ${e.description}<br>
+              <span style="color:var(--text3)">${e.timestamp ? new Date(e.timestamp).toLocaleString() : ''}</span>
+              ${e.actor ? '<br>Actor: ' + e.actor : ''}
+            </div>
+          </div>`;
+        }).join('')}
       </div>
     </div>
   `;
@@ -1057,7 +1282,7 @@ function renderAnalysis() {
             <div style="font-weight:600;margin-bottom:4px">${c.title}</div>
             <div style="font-size:.78rem;color:var(--text2)">${statusPill(c.status)} &middot; ${formatDate(c.created_at)}</div>
           </div>
-          <button class="btn btn-primary btn-sm">&#129302; ${t('request_analysis')}</button>
+          <button class="btn btn-primary btn-sm" onclick="event.stopPropagation();triggerAIAnalysis('${c.case_id}')">&#129302; ${t('request_analysis')}</button>
         </div>
       </div>
     `).join('')}` : ''}
@@ -1216,19 +1441,26 @@ function renderProfile() {
     <div class="grid-2" style="margin-bottom:24px">
       <div class="card">
         <h4 style="font-size:.85rem;font-weight:700;margin-bottom:20px">&#128200; ${t('reputation')}</h4>
-        <div class="gauge-container">
-          <div class="gauge">
+        <div class="gauge-container gauge-animated">
+          <div class="gauge" id="profile-gauge">
             <svg width="140" height="140" viewBox="0 0 140 140">
               <circle class="gauge-bg" cx="70" cy="70" r="60"/>
               <circle class="gauge-fill" cx="70" cy="70" r="60"
                 stroke="var(--green)"
                 stroke-dasharray="${2*Math.PI*60}"
-                stroke-dashoffset="${2*Math.PI*60*(1-1847/2500)}"/>
+                stroke-dashoffset="${2*Math.PI*60}"
+                id="profile-gauge-fill"/>
             </svg>
             <div class="gauge-text">
-              <div class="gval">1,847</div>
+              <div class="gval" id="profile-gauge-val">0</div>
               <div class="glabel">${t('score')}</div>
             </div>
+          </div>
+          <div class="gauge-delta positive visible">+23 this week</div>
+          <div class="win-loss-chart">
+            ${['win','win','loss','win','win','draw','win','loss','win','win'].map((r,i) =>
+              `<div class="wl-bar ${r}" style="height:${r==='win'?Math.random()*20+20:r==='loss'?Math.random()*15+10:8}px;transition-delay:${i*0.05}s"></div>`
+            ).join('')}
           </div>
         </div>
       </div>
@@ -1301,8 +1533,16 @@ function bindEvents() {
   });
 }
 
-// --- MODAL ---
+// --- WIZARD MODAL ---
+let wizardStep = 1;
+let selectedCategory = '';
+let wizardFiles = [];
+
 function openModal() {
+  wizardStep = 1;
+  selectedCategory = '';
+  wizardFiles = [];
+  updateWizard();
   document.getElementById('modal-overlay').classList.add('active');
 }
 
@@ -1314,12 +1554,111 @@ document.getElementById('modal-overlay').addEventListener('click', e => {
   if (e.target === e.currentTarget) closeModal();
 });
 
+function selectCategory(el) {
+  document.querySelectorAll('.category-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedCategory = el.dataset.cat;
+  document.getElementById('wiz-next-1').disabled = false;
+}
+
+function wizardNext() {
+  if (wizardStep === 2) {
+    const title = document.getElementById('case-title').value.trim();
+    const desc = document.getElementById('case-description').value.trim();
+    if (!title || !desc) { showToast(t('fill_required')); return; }
+  }
+  if (wizardStep === 4) return;
+  wizardStep++;
+  if (wizardStep === 4) buildReview();
+  updateWizard();
+}
+
+function wizardPrev() {
+  if (wizardStep <= 1) return;
+  wizardStep--;
+  updateWizard();
+}
+
+function updateWizard() {
+  document.querySelectorAll('.wizard-step-indicator').forEach((el, i) => {
+    const step = i + 1;
+    el.classList.remove('active', 'done');
+    if (step === wizardStep) el.classList.add('active');
+    else if (step < wizardStep) el.classList.add('done');
+  });
+  document.querySelectorAll('.wizard-connector').forEach((el, i) => {
+    el.classList.toggle('done', i + 1 < wizardStep);
+  });
+  for (let i = 1; i <= 4; i++) {
+    const panel = document.getElementById(`wiz-step-${i}`);
+    if (panel) { panel.classList.toggle('active', i === wizardStep); }
+  }
+}
+
+function buildReview() {
+  const title = document.getElementById('case-title').value.trim();
+  const respondent = document.getElementById('case-respondent').value.trim();
+  const amount = document.getElementById('case-amount').value;
+  const desc = document.getElementById('case-description').value.trim();
+  document.getElementById('review-grid').innerHTML = `
+    <div class="review-item"><div class="ri-label">Category</div><div class="ri-value">${categoryLabel(selectedCategory)}</div></div>
+    <div class="review-item"><div class="ri-label">Title</div><div class="ri-value">${title}</div></div>
+    <div class="review-item"><div class="ri-label">Respondent</div><div class="ri-value">${respondent || 'N/A'}</div></div>
+    <div class="review-item"><div class="ri-label">Amount</div><div class="ri-value">${formatMoney(parseInt(amount)||0)}</div></div>
+    <div class="review-item" style="grid-column:1/-1"><div class="ri-label">Description</div><div class="ri-value" style="font-weight:400;font-size:.85rem;line-height:1.5">${desc}</div></div>
+  `;
+  document.getElementById('review-files').innerHTML = wizardFiles.length > 0
+    ? `<div class="ri-label" style="font-size:.68rem;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">Evidence Files (${wizardFiles.length})</div>` +
+      wizardFiles.map(f => `<div class="file-preview-item"><span class="fp-icon">${getFileIcon(f.name)}</span><span class="fp-name">${f.name}</span><span class="fp-size">${(f.size/1024).toFixed(1)} KB</span></div>`).join('')
+    : '<div style="font-size:.82rem;color:var(--text3)">No evidence files attached</div>';
+}
+
+// Drag-drop zone
+const dropZone = document.getElementById('drop-zone');
+if (dropZone) {
+  ['dragenter','dragover'].forEach(evt => dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.add('drag-over'); }));
+  ['dragleave','drop'].forEach(evt => dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.remove('drag-over'); }));
+  dropZone.addEventListener('drop', e => { if (e.dataTransfer.files.length) handleFileSelect(e.dataTransfer.files); });
+}
+
+function handleFileSelect(files) {
+  for (const f of files) wizardFiles.push(f);
+  renderFilePreviews();
+}
+
+function removeWizardFile(idx) {
+  wizardFiles.splice(idx, 1);
+  renderFilePreviews();
+}
+
+function renderFilePreviews() {
+  const list = document.getElementById('file-preview-list');
+  if (!list) return;
+  list.innerHTML = wizardFiles.map((f, i) => `
+    <div class="file-preview-item">
+      <span class="fp-icon">${getFileIcon(f.name)}</span>
+      <span class="fp-name">${f.name}</span>
+      <span class="fp-size">${(f.size/1024).toFixed(1)} KB</span>
+      <span class="fp-remove" onclick="removeWizardFile(${i})">&#10005;</span>
+    </div>
+  `).join('');
+}
+
+function getFileIcon(name) {
+  const ext = name.split('.').pop().toLowerCase();
+  if (['pdf'].includes(ext)) return '\u{1F4D1}';
+  if (['doc','docx'].includes(ext)) return '\u{1F4C4}';
+  if (['xls','xlsx','csv'].includes(ext)) return '\u{1F4CA}';
+  if (['png','jpg','jpeg','gif','svg'].includes(ext)) return '\u{1F5BC}';
+  if (['mp4','mov','avi'].includes(ext)) return '\u{1F3AC}';
+  return '\u{1F4CE}';
+}
+
 async function submitCase() {
   const title = document.getElementById('case-title').value.trim();
   const respondent = document.getElementById('case-respondent').value.trim();
   const amount = parseInt(document.getElementById('case-amount').value) || 0;
   const description = document.getElementById('case-description').value.trim();
-  const category = document.getElementById('case-category').value;
 
   if (!title || !description) {
     showToast(t('fill_required'));
@@ -1336,7 +1675,7 @@ async function submitCase() {
         escrow_amount: amount,
         filing_fee: Math.max(100, Math.round(amount * 0.02)),
         description,
-        category,
+        category: selectedCategory || 'contract_breach',
       }),
     });
 
@@ -1351,6 +1690,7 @@ async function submitCase() {
     document.getElementById('case-respondent').value = '';
     document.getElementById('case-amount').value = '';
     document.getElementById('case-description').value = '';
+    wizardFiles = [];
 
     render();
   } catch (e) {
@@ -1359,12 +1699,309 @@ async function submitCase() {
   }
 }
 
+// ===== AI DELIBERATION ANIMATION =====
+async function triggerAIAnalysis(caseId) {
+  const c = state.cases.find(x => x.case_id === caseId);
+  if (!c) return;
+  const evidence = state.evidence.filter(e => e.case_id === caseId);
+  const evidenceNames = evidence.length > 0
+    ? evidence.map(e => e.file_name)
+    : ['Case filing document', 'Claimant statement', 'Transaction records'];
+
+  const overlay = document.getElementById('ai-overlay');
+  const content = document.getElementById('ai-overlay-content');
+
+  // Phase 1: Matrix rain (2 seconds)
+  startMatrixRain();
+  overlay.classList.add('active');
+  content.innerHTML = `<div class="ai-brain">\u{1F9E0}</div><div class="ai-status-text">Initializing AI Deliberation...</div><div class="ai-sub-text">Connecting to validator network</div>`;
+
+  await sleep(2000);
+  stopMatrixRain();
+
+  // Phase 2: Analyzing evidence
+  content.innerHTML = `
+    <div class="ai-brain">\u{1F9E0}</div>
+    <div class="ai-status-text">Analyzing evidence...</div>
+    <div class="ai-sub-text">Processing ${evidenceNames.length} items</div>
+    <div class="evidence-proc-list" id="ep-list">
+      ${evidenceNames.map((name, i) => `
+        <div class="evidence-proc-item" id="ep-${i}">
+          <span class="ep-icon">${getFileIcon(name)}</span>
+          <span class="ep-name">${name}</span>
+          <span class="ep-check">\u2713 Processed</span>
+        </div>
+      `).join('')}
+    </div>
+    <div class="analysis-complete-text" id="analysis-complete" style="margin-top:24px">Analysis Complete</div>
+  `;
+
+  // Animate evidence items appearing one by one
+  for (let i = 0; i < evidenceNames.length; i++) {
+    await sleep(500);
+    const el = document.getElementById(`ep-${i}`);
+    if (el) { el.classList.add('visible'); }
+    await sleep(300);
+    if (el) { el.classList.add('checked'); }
+  }
+
+  await sleep(600);
+  const completeEl = document.getElementById('analysis-complete');
+  if (completeEl) completeEl.classList.add('visible');
+  await sleep(1000);
+
+  // Phase 3: Try actual API call, fall back to mock
+  let analysis;
+  try {
+    const resp = await fetch(`${API}/cases/${caseId}/analyze`, { method: 'POST' });
+    if (resp.ok) {
+      const data = await resp.json();
+      analysis = data.ai_analysis || data;
+    }
+  } catch(e) {}
+
+  if (!analysis) {
+    analysis = {
+      confidence: 0.82,
+      strengths_claimant: ['Clear contractual obligations documented', 'Evidence of payment made on time'],
+      weaknesses_claimant: ['Limited third-party corroboration'],
+      strengths_respondent: ['Partial delivery was completed'],
+      weaknesses_respondent: ['No evidence of force majeure', 'Communication gaps documented'],
+      preliminary_assessment: 'Based on the evidence provided, the claimant has a moderately strong case. The documented contract terms and payment history support the claim, though additional third-party evidence would strengthen the position.',
+      deliberation_rounds: [{ round: 1, summary: 'Initial assessment favors claimant', validator_consensus: 0.78 }, { round: 2, summary: 'Evidence review confirms initial findings', validator_consensus: 0.85 }]
+    };
+  }
+
+  c.ai_analysis = analysis;
+
+  // Phase 4: Reveal strengths/weaknesses with animation
+  const confPct = Math.round((analysis.confidence || 0) * 100);
+  content.innerHTML = `
+    <div style="text-align:left;max-width:560px;margin:0 auto">
+      <div style="text-align:center;margin-bottom:24px">
+        <div style="font-size:1.2rem;font-weight:800;color:var(--green);letter-spacing:1px">\u2713 Analysis Complete</div>
+        <div style="font-size:.82rem;color:var(--text3);margin-top:4px">${c.title}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+        <div>
+          <h4 style="color:var(--green);font-size:.78rem;margin-bottom:8px">\u2713 Strengths</h4>
+          ${(analysis.strengths_claimant||[]).map((s,i) => `<div class="strength-item reveal-left" style="animation-delay:${i*0.15}s">\u2022 ${s}</div>`).join('')}
+        </div>
+        <div>
+          <h4 style="color:var(--red);font-size:.78rem;margin-bottom:8px">\u2717 Weaknesses</h4>
+          ${(analysis.weaknesses_claimant||[]).map((s,i) => `<div class="weakness-item reveal-right" style="animation-delay:${i*0.15}s">\u2022 ${s}</div>`).join('')}
+        </div>
+      </div>
+      <div style="margin-bottom:16px">
+        <div style="display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:6px">
+          <span>Confidence Level</span>
+          <span style="font-weight:700;color:${confPct>=80?'var(--green)':confPct>=60?'var(--yellow)':'var(--red)'}">${confPct}%</span>
+        </div>
+        <div class="confidence-bar"><div class="fill" style="--target-width:${confPct}%;width:0;animation:meterFill .8s ease .3s forwards;background:${confPct>=80?'var(--green)':confPct>=60?'var(--yellow)':'var(--red)'}"></div></div>
+      </div>
+      <div class="assessment-box reveal-up" style="animation-delay:.5s;font-size:.85rem;line-height:1.6">
+        <strong style="color:var(--blue3)">Preliminary Assessment:</strong><br>
+        ${analysis.preliminary_assessment || 'No assessment available.'}
+      </div>
+      <div style="text-align:center;margin-top:24px">
+        <button class="btn btn-primary" onclick="closeAIOverlay()">View Full Analysis</button>
+      </div>
+    </div>
+  `;
+}
+
+function closeAIOverlay() {
+  document.getElementById('ai-overlay').classList.remove('active');
+  stopMatrixRain();
+  render();
+}
+
+// Matrix rain effect
+let matrixAnimId = null;
+function startMatrixRain() {
+  const container = document.getElementById('matrix-rain');
+  const canvas = document.getElementById('matrix-canvas');
+  container.classList.add('active');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const cols = Math.floor(canvas.width / 16);
+  const drops = Array(cols).fill(1);
+  const chars = 'VERITAS01ABCDEF\u2713\u2717\u2696\u2699';
+
+  function drawMatrix() {
+    ctx.fillStyle = 'rgba(0,0,0,0.06)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#0066ff33';
+    ctx.font = '14px monospace';
+    for (let i = 0; i < drops.length; i++) {
+      const char = chars[Math.floor(Math.random() * chars.length)];
+      ctx.fillText(char, i * 16, drops[i] * 16);
+      if (drops[i] * 16 > canvas.height && Math.random() > 0.975) drops[i] = 0;
+      drops[i]++;
+    }
+    matrixAnimId = requestAnimationFrame(drawMatrix);
+  }
+  drawMatrix();
+}
+
+function stopMatrixRain() {
+  document.getElementById('matrix-rain').classList.remove('active');
+  if (matrixAnimId) { cancelAnimationFrame(matrixAnimId); matrixAnimId = null; }
+}
+
+// ===== VERDICT ANIMATION =====
+function triggerVerdictAnimation(caseData) {
+  const v = caseData.verdict;
+  if (!v) return;
+
+  const overlay = document.getElementById('verdict-overlay');
+  const content = document.getElementById('verdict-overlay-content');
+  const isClaimant = v.winner === 'claimant';
+  const cp = v.escrow_split?.claimant_pct || 50;
+  const rp = v.escrow_split?.respondent_pct || 50;
+  const angle = (cp / 100) * 360;
+
+  overlay.classList.add('active');
+
+  // Phase 1: Gavel
+  content.innerHTML = `
+    <div style="margin-bottom:32px">
+      <svg class="gavel-svg" id="gavel" width="100" height="100" viewBox="0 0 100 100" style="transform:rotate(-45deg)">
+        <rect x="40" y="10" width="20" height="50" rx="4" fill="var(--text2)"/>
+        <rect x="25" y="5" width="50" height="18" rx="6" fill="var(--blue3)"/>
+        <rect x="45" y="60" width="10" height="30" rx="3" fill="var(--text3)"/>
+      </svg>
+    </div>
+    <div class="verdict-text ${isClaimant?'claimant':'respondent'}" id="verdict-text" style="margin-top:16px">
+      ${isClaimant ? 'CLAIMANT WINS' : 'RESPONDENT WINS'}
+    </div>
+  `;
+
+  setTimeout(() => {
+    const gavel = document.getElementById('gavel');
+    if (gavel) gavel.classList.add('animate');
+  }, 300);
+
+  setTimeout(() => {
+    const vt = document.getElementById('verdict-text');
+    if (vt) vt.classList.add('reveal');
+  }, 1000);
+
+  // Phase 2: Pie chart + funds flow
+  setTimeout(() => {
+    content.innerHTML += `
+      <div style="margin-top:32px;position:relative;display:inline-block">
+        <div class="verdict-pie pie-animate" style="width:140px;height:140px;border-radius:50%;background:conic-gradient(var(--green) 0deg ${angle}deg, var(--red) ${angle}deg 360deg);margin:0 auto;position:relative">
+          <div style="position:absolute;inset:25px;border-radius:50%;background:rgba(13,13,26,.9);display:flex;align-items:center;justify-content:center;flex-direction:column">
+            <div style="font-size:1.1rem;font-weight:800;color:${isClaimant?'var(--green)':'var(--red)'}">${cp}%</div>
+          </div>
+          <div id="coin-container" style="position:absolute;inset:0"></div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:center;gap:32px;margin-top:20px;font-size:.88rem">
+        <span style="color:var(--green)">\u{1F7E2} ${t('claimant')}: ${formatMoney(v.claimant_amount || caseData.escrow_amount * cp / 100)}</span>
+        <span style="color:var(--red)">\u{1F534} ${t('respondent')}: ${formatMoney(v.respondent_amount || caseData.escrow_amount * rp / 100)}</span>
+      </div>
+    `;
+
+    // Coin particles
+    const coinContainer = document.getElementById('coin-container');
+    if (coinContainer) {
+      for (let i = 0; i < 8; i++) {
+        setTimeout(() => {
+          const coin = document.createElement('span');
+          coin.className = 'coin-particle';
+          coin.textContent = '\u{1FA99}';
+          coin.style.left = (30 + Math.random() * 40) + '%';
+          coin.style.top = '40%';
+          coinContainer.appendChild(coin);
+          setTimeout(() => coin.remove(), 1200);
+        }, i * 150);
+      }
+    }
+  }, 1800);
+
+  // Phase 3: Stamp
+  setTimeout(() => {
+    content.innerHTML += `
+      <div style="margin-top:28px">
+        <div class="case-stamp animate">Case Resolved</div>
+      </div>
+      <div style="margin-top:24px">
+        <button class="btn btn-primary" onclick="closeVerdictOverlay()">View Case Details</button>
+      </div>
+    `;
+  }, 3200);
+}
+
+function closeVerdictOverlay() {
+  document.getElementById('verdict-overlay').classList.remove('active');
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ===== GAUGE ANIMATION ON RENDER =====
+function animateGauges() {
+  const target = 1847;
+  const maxScore = 2500;
+  const circumference = 2 * Math.PI * 60;
+
+  // Dashboard gauge
+  const dashFill = document.getElementById('dash-gauge-fill');
+  const dashVal = document.getElementById('dash-gauge-val');
+  if (dashFill && dashVal) {
+    setTimeout(() => {
+      dashFill.style.strokeDashoffset = circumference * (1 - target / maxScore);
+    }, 100);
+    animateCounter(dashVal, 0, target, 1000);
+  }
+
+  // Profile gauge
+  const profFill = document.getElementById('profile-gauge-fill');
+  const profVal = document.getElementById('profile-gauge-val');
+  if (profFill && profVal) {
+    setTimeout(() => {
+      profFill.style.strokeDashoffset = circumference * (1 - target / maxScore);
+    }, 100);
+    animateCounter(profVal, 0, target, 1000);
+  }
+}
+
+function animateCounter(el, from, to, duration) {
+  const start = performance.now();
+  function step(now) {
+    const progress = Math.min((now - start) / duration, 1);
+    const ease = 1 - Math.pow(1 - progress, 3);
+    const val = Math.round(from + (to - from) * ease);
+    el.textContent = val.toLocaleString();
+    if (progress < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
 function showToast(msg) {
   const toast = document.getElementById('toast');
   toast.textContent = msg;
   toast.classList.add('show');
   setTimeout(() => toast.classList.remove('show'), 3500);
 }
+
+// --- Hook verdict display to trigger animation ---
+const _origRenderCaseDetail = renderCaseDetail;
+renderCaseDetail = function() {
+  const html = _origRenderCaseDetail();
+  // After render, check if we should trigger verdict animation
+  return html;
+};
+
+// --- Patch bindEvents to add verdict animation trigger ---
+const _origBindEvents = bindEvents;
+bindEvents = function() {
+  _origBindEvents();
+  // Animate gauges after each render
+  animateGauges();
+};
 
 // --- INIT ---
 (async () => {

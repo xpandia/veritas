@@ -925,6 +925,19 @@
             text-decoration: none;
         }
 
+        /* Language Selector */
+        .lang-selector{position:fixed;top:16px;right:100px;z-index:101}
+        @media(max-width:768px){.lang-selector{right:60px;top:12px}}
+        .lang-btn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:6px 12px;font-size:.78rem;cursor:pointer;display:flex;align-items:center;gap:6px;color:rgba(255,255,255,.75);font-weight:500;backdrop-filter:blur(8px);transition:all .2s}
+        .lang-btn:hover{background:rgba(255,255,255,.14);border-color:rgba(0,102,255,.4)}
+        .lang-dropdown{position:absolute;top:calc(100% + 6px);right:0;background:var(--charcoal-light);border:1px solid rgba(255,255,255,.1);border-radius:10px;box-shadow:0 10px 40px rgba(0,0,0,.4);min-width:160px;opacity:0;pointer-events:none;transform:translateY(-4px);transition:all .2s}
+        .lang-dropdown.open{opacity:1;pointer-events:auto;transform:translateY(0)}
+        .lang-option{display:flex;align-items:center;gap:8px;padding:10px 16px;font-size:.82rem;color:var(--gray-300);cursor:pointer;transition:background .15s}
+        .lang-option:first-child{border-radius:10px 10px 0 0}
+        .lang-option:last-child{border-radius:0 0 10px 10px}
+        .lang-option:hover{background:rgba(0,102,255,.1)}
+        .lang-option.active{background:rgba(0,102,255,.12);color:var(--blue-light);font-weight:600}
+
         /* ============ SCROLL REVEAL ============ */
         .reveal {
             opacity: 0;
@@ -1029,6 +1042,16 @@
     <!-- Particle Background -->
     <canvas id="particle-canvas"></canvas>
 
+    <!-- Language Selector -->
+    <div class="lang-selector">
+      <button class="lang-btn" onclick="toggleLangDropdown()">&#127760; <span id="currentLangLabel">English</span> &#9662;</button>
+      <div class="lang-dropdown" id="langDropdown">
+        <div class="lang-option active" data-lang="en" onclick="setLanguage('en')">&#127468;&#127463; English</div>
+        <div class="lang-option" data-lang="es" onclick="setLanguage('es')">&#127466;&#127480; Espa&#241;ol</div>
+        <div class="lang-option" data-lang="zh" onclick="setLanguage('zh')">&#127464;&#127475; &#20013;&#25991;</div>
+      </div>
+    </div>
+
     <!-- Navigation -->
     <nav id="navbar">
         <a href="#" class="nav-logo">
@@ -1040,12 +1063,12 @@
             Veritas
         </a>
         <ul class="nav-links" id="nav-links">
-            <li><a href="#problem">Problem</a></li>
-            <li><a href="#solution">Solution</a></li>
-            <li><a href="#how-it-works">How It Works</a></li>
-            <li><a href="#use-cases">Use Cases</a></li>
-            <li><a href="#trust">Security</a></li>
-            <li><a href="#cta" class="nav-cta">Get Started</a></li>
+            <li><a href="#problem" data-i18n="nav_problem">Problem</a></li>
+            <li><a href="#solution" data-i18n="nav_solution">Solution</a></li>
+            <li><a href="#how-it-works" data-i18n="nav_how">How It Works</a></li>
+            <li><a href="#use-cases" data-i18n="nav_use_cases">Use Cases</a></li>
+            <li><a href="#trust" data-i18n="nav_security">Security</a></li>
+            <li><a href="#cta" class="nav-cta" data-i18n="nav_cta">Get Started</a></li>
         </ul>
         <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Toggle menu">
             <span></span>
@@ -1061,15 +1084,15 @@
                 <span class="pulse"></span>
                 Built on GenLayer Blockchain
             </div>
-            <h1>Justice.<br><span class="highlight">Automated.</span><br>For Everyone.</h1>
-            <p>Resolve disputes in minutes, not months. Veritas replaces expensive arbitrators with AI-consensus validators on a blockchain built to reason.</p>
+            <h1 data-i18n-html="hero_title">Justice.<br><span class="highlight">Automated.</span><br>For Everyone.</h1>
+            <p data-i18n="hero_desc">Resolve disputes in minutes, not months. Veritas replaces expensive arbitrators with AI-consensus validators on a blockchain built to reason.</p>
             <div class="hero-buttons">
                 <a href="#cta" class="btn-primary">
-                    <span>File a Dispute</span>
+                    <span data-i18n="hero_cta1">File a Dispute</span>
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </a>
                 <a href="#how-it-works" class="btn-secondary">
-                    <span>See How It Works</span>
+                    <span data-i18n="hero_cta2">See How It Works</span>
                 </a>
             </div>
 
@@ -1116,19 +1139,19 @@
             <div class="stats-grid">
                 <div class="stat-item reveal">
                     <div class="stat-number">$91K<span class="unit">+</span></div>
-                    <div class="stat-label">Average arbitration cost</div>
+                    <div class="stat-label" data-i18n="stat_avg_cost">Average arbitration cost</div>
                 </div>
                 <div class="stat-item reveal">
                     <div class="stat-number">18<span class="unit">mo</span></div>
-                    <div class="stat-label">Average resolution time</div>
+                    <div class="stat-label" data-i18n="stat_avg_time">Average resolution time</div>
                 </div>
                 <div class="stat-item reveal">
                     <div class="stat-number">< $1<span class="unit"></span></div>
-                    <div class="stat-label">Veritas resolution cost</div>
+                    <div class="stat-label" data-i18n="stat_vr_cost">Veritas resolution cost</div>
                 </div>
                 <div class="stat-item reveal">
                     <div class="stat-number">~5<span class="unit">min</span></div>
-                    <div class="stat-label">Veritas resolution time</div>
+                    <div class="stat-label" data-i18n="stat_vr_time">Veritas resolution time</div>
                 </div>
             </div>
         </div>
@@ -1138,8 +1161,8 @@
     <section class="problem" id="problem">
         <div class="container">
             <div class="reveal">
-                <span class="section-label">The Problem</span>
-                <h2 class="section-title">Justice has a price tag.<br>Most people can't afford it.</h2>
+                <span class="section-label" data-i18n="problem_label">The Problem</span>
+                <h2 class="section-title" data-i18n-html="problem_title">Justice has a price tag.<br>Most people can't afford it.</h2>
                 <p class="section-subtitle">The current arbitration system is designed for corporations with unlimited budgets, not for the people who need it most.</p>
             </div>
             <div class="problem-grid">
@@ -1167,8 +1190,8 @@
     <section id="solution" style="padding: 0 0 4rem;">
         <div class="container">
             <div class="reveal" style="margin-bottom: 3rem;">
-                <span class="section-label">The Solution</span>
-                <h2 class="section-title">Replace arbitrators with<br>AI consensus validators.</h2>
+                <span class="section-label" data-i18n="solution_label">The Solution</span>
+                <h2 class="section-title" data-i18n-html="solution_title">Replace arbitrators with<br>AI consensus validators.</h2>
                 <p class="section-subtitle">Veritas runs on GenLayer, the only blockchain where smart contracts can reason, analyze evidence, and reach fair verdicts.</p>
             </div>
             <div class="solution-preview reveal">
@@ -1207,8 +1230,8 @@
     <section class="how-it-works" id="how-it-works">
         <div class="container">
             <div class="how-header reveal">
-                <span class="section-label">How It Works</span>
-                <h2 class="section-title">Three steps. That's it.</h2>
+                <span class="section-label" data-i18n="how_label">How It Works</span>
+                <h2 class="section-title" data-i18n="how_title">Three steps. That's it.</h2>
                 <p class="section-subtitle">From dispute to resolution in minutes. No lawyers, no waiting rooms, no uncertainty.</p>
             </div>
             <div class="steps">
@@ -1360,9 +1383,9 @@
     <section class="cta" id="cta">
         <div class="container">
             <div class="cta-content reveal">
-                <span class="section-label">Start Now</span>
-                <h2>Disputes shouldn't<br>bankrupt you.</h2>
-                <p>Veritas is live on GenLayer Testnet Bradbury. File your first dispute and experience justice at the speed of consensus.</p>
+                <span class="section-label" data-i18n="cta_label">Start Now</span>
+                <h2 data-i18n-html="cta_title">Disputes shouldn't<br>bankrupt you.</h2>
+                <p data-i18n="cta_desc">Veritas is live on GenLayer Testnet Bradbury. File your first dispute and experience justice at the speed of consensus.</p>
                 <div class="cta-buttons">
                     <a href="#" class="btn-primary">
                         <span>Launch App</span>
@@ -1396,6 +1419,92 @@
     </footer>
 
     <script>
+        // ============ i18n System ============
+        const i18n = {
+          en: {
+            lang_label:'English',
+            nav_problem:'Problem',nav_solution:'Solution',nav_how:'How It Works',nav_use_cases:'Use Cases',nav_security:'Security',nav_cta:'Get Started',
+            hero_title:'Justice.<br><span class="highlight">Automated.</span><br>For Everyone.',
+            hero_desc:'Resolve disputes in minutes, not months. Veritas replaces expensive arbitrators with AI-consensus validators on a blockchain built to reason.',
+            hero_cta1:'File a Dispute',hero_cta2:'See How It Works',
+            stat_avg_cost:'Average arbitration cost',stat_avg_time:'Average resolution time',
+            stat_vr_cost:'Veritas resolution cost',stat_vr_time:'Veritas resolution time',
+            problem_label:'The Problem',problem_title:"Justice has a price tag.<br>Most people can't afford it.",
+            solution_label:'The Solution',solution_title:'Replace arbitrators with<br>AI consensus validators.',
+            how_label:'How It Works',how_title:"Three steps. That's it.",
+            cta_label:'Start Now',cta_title:"Disputes shouldn't<br>bankrupt you.",
+            cta_desc:'Veritas is live on GenLayer Testnet Bradbury. File your first dispute and experience justice at the speed of consensus.',
+          },
+          es: {
+            lang_label:'Espa\u00f1ol',
+            nav_problem:'Problema',nav_solution:'Soluci\u00f3n',nav_how:'C\u00f3mo Funciona',nav_use_cases:'Casos de Uso',nav_security:'Seguridad',nav_cta:'Comenzar',
+            hero_title:'Justicia.<br><span class="highlight">Automatizada.</span><br>Para Todos.',
+            hero_desc:'Resuelve disputas en minutos, no en meses. Veritas reemplaza arbitradores costosos con validadores de consenso IA en una blockchain dise\u00f1ada para razonar.',
+            hero_cta1:'Presentar Disputa',hero_cta2:'Ver C\u00f3mo Funciona',
+            stat_avg_cost:'Costo promedio de arbitraje',stat_avg_time:'Tiempo promedio de resoluci\u00f3n',
+            stat_vr_cost:'Costo de resoluci\u00f3n Veritas',stat_vr_time:'Tiempo de resoluci\u00f3n Veritas',
+            problem_label:'El Problema',problem_title:'La justicia tiene precio.<br>La mayor\u00eda no puede pagarla.',
+            solution_label:'La Soluci\u00f3n',solution_title:'Reemplaza arbitradores con<br>validadores de consenso IA.',
+            how_label:'C\u00f3mo Funciona',how_title:'Tres pasos. Eso es todo.',
+            cta_label:'Comienza Ahora',cta_title:'Las disputas no deber\u00edan<br>arruinarte.',
+            cta_desc:'Veritas est\u00e1 en GenLayer Testnet Bradbury. Presenta tu primera disputa y experimenta justicia a la velocidad del consenso.',
+          },
+          zh: {
+            lang_label:'\u4e2d\u6587',
+            nav_problem:'\u95ee\u9898',nav_solution:'\u89e3\u51b3\u65b9\u6848',nav_how:'\u5982\u4f55\u8fd0\u4f5c',nav_use_cases:'\u7528\u4f8b',nav_security:'\u5b89\u5168',nav_cta:'\u5f00\u59cb\u4f7f\u7528',
+            hero_title:'\u6b63\u4e49\u3002<br><span class="highlight">\u81ea\u52a8\u5316\u3002</span><br>\u4eba\u4eba\u53ef\u7528\u3002',
+            hero_desc:'\u5728\u51e0\u5206\u949f\u800c\u975e\u51e0\u4e2a\u6708\u5185\u89e3\u51b3\u4e89\u8bae\u3002Veritas \u7528 AI \u5171\u8bc6\u9a8c\u8bc1\u5668\u53d6\u4ee3\u6602\u8d35\u7684\u4ef2\u88c1\u5458\uff0c\u8fd0\u884c\u5728\u4e13\u4e3a\u63a8\u7406\u800c\u5efa\u7684\u533a\u5757\u94fe\u4e0a\u3002',
+            hero_cta1:'\u63d0\u4ea4\u4e89\u8bae',hero_cta2:'\u4e86\u89e3\u5982\u4f55\u8fd0\u4f5c',
+            stat_avg_cost:'\u5e73\u5747\u4ef2\u88c1\u8d39\u7528',stat_avg_time:'\u5e73\u5747\u89e3\u51b3\u65f6\u95f4',
+            stat_vr_cost:'Veritas \u89e3\u51b3\u8d39\u7528',stat_vr_time:'Veritas \u89e3\u51b3\u65f6\u95f4',
+            problem_label:'\u95ee\u9898',problem_title:'\u6b63\u4e49\u6709\u4ef7\u683c\u3002<br>\u5927\u591a\u6570\u4eba\u8d1f\u62c5\u4e0d\u8d77\u3002',
+            solution_label:'\u89e3\u51b3\u65b9\u6848',solution_title:'\u7528 AI \u5171\u8bc6\u9a8c\u8bc1\u5668<br>\u53d6\u4ee3\u4ef2\u88c1\u5458\u3002',
+            how_label:'\u5982\u4f55\u8fd0\u4f5c',how_title:'\u4e09\u4e2a\u6b65\u9aa4\u3002\u5c31\u8fd9\u4e48\u7b80\u5355\u3002',
+            cta_label:'\u7acb\u5373\u5f00\u59cb',cta_title:'\u4e89\u8bae\u4e0d\u5e94\u8be5<br>\u8ba9\u4f60\u7834\u4ea7\u3002',
+            cta_desc:'Veritas \u5df2\u5728 GenLayer Testnet Bradbury \u4e0a\u7ebf\u3002\u63d0\u4ea4\u60a8\u7684\u7b2c\u4e00\u4e2a\u4e89\u8bae\uff0c\u4f53\u9a8c\u5171\u8bc6\u901f\u5ea6\u7684\u6b63\u4e49\u3002',
+          }
+        };
+
+        let currentLang = localStorage.getItem('vr_landing_lang') || 'en';
+        function t(key) { return i18n[currentLang]?.[key] || i18n.en[key] || key; }
+
+        function applyI18n() {
+          document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            const val = t(key);
+            if (val) el.textContent = val;
+          });
+          document.querySelectorAll('[data-i18n-html]').forEach(el => {
+            const key = el.getAttribute('data-i18n-html');
+            const val = t(key);
+            if (val) el.innerHTML = val;
+          });
+          document.getElementById('currentLangLabel').textContent = i18n[currentLang]?.lang_label || 'English';
+          document.querySelectorAll('.lang-option').forEach(opt => {
+            opt.classList.toggle('active', opt.dataset.lang === currentLang);
+          });
+          document.documentElement.lang = currentLang === 'zh' ? 'zh-Hans' : currentLang;
+        }
+
+        function setLanguage(lang) {
+          currentLang = lang;
+          localStorage.setItem('vr_landing_lang', lang);
+          applyI18n();
+          document.getElementById('langDropdown').classList.remove('open');
+        }
+
+        function toggleLangDropdown() {
+          document.getElementById('langDropdown').classList.toggle('open');
+        }
+
+        document.addEventListener('click', (e) => {
+          if (!e.target.closest('.lang-selector')) {
+            document.getElementById('langDropdown').classList.remove('open');
+          }
+        });
+
+        applyI18n();
+
         // ============ PARTICLE BACKGROUND ============
         const canvas = document.getElementById('particle-canvas');
         const ctx = canvas.getContext('2d');

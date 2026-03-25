@@ -572,10 +572,290 @@ class NotificationMarkRead(BaseModel):
 #  Application Lifespan
 # ---------------------------------------------------------------------------
 
+def seed_demo_data():
+    """Seed the database with demo users, cases, evidence, and timeline events."""
+    # Check if already seeded
+    if db_all_users():
+        return
+
+    logger.info("Seeding demo data...")
+
+    # --- Demo Users ---
+    user1 = {
+        "user_id": "usr-demo-alice-001",
+        "email": "alice@veritas.legal",
+        "password_hash": hash_password("demo1234"),
+        "display_name": "Alice Montoya",
+        "wallet_address": "0xAlice0001aaBBccDDeeFF00112233445566778899",
+        "created_at": "2026-02-15T09:00:00+00:00",
+    }
+    user2 = {
+        "user_id": "usr-demo-bob-002",
+        "email": "bob@veritas.legal",
+        "password_hash": hash_password("demo1234"),
+        "display_name": "Roberto Vega",
+        "wallet_address": "0xBob00002aaBBccDDeeFF00112233445566778899",
+        "created_at": "2026-02-20T14:30:00+00:00",
+    }
+    db_put_user(user1)
+    db_put_user(user2)
+
+    now = datetime.now(timezone.utc)
+
+    # --- Case 1: FILED (recent) ---
+    case1_id = "case-demo-001"
+    case1 = {
+        "case_id": case1_id,
+        "on_chain_dispute_id": "gl-dispute-0x7a1",
+        "claimant_id": user1["user_id"],
+        "claimant_address": user1["wallet_address"],
+        "claimant_name": user1["display_name"],
+        "respondent_address": "0xResp0003aaBBccDDeeFF00112233445566778899",
+        "respondent_name": "TechNova Solutions S.A.",
+        "category": "contract_breach",
+        "title": "Incumplimiento de Contrato SaaS — Entrega de Plataforma",
+        "description": (
+            "El demandado se comprometio contractualmente a entregar una plataforma SaaS "
+            "de gestion de inventario antes del 1 de enero de 2026. A la fecha, la plataforma "
+            "presenta fallos criticos en los modulos de facturacion y reportes, incumpliendo "
+            "los hitos del contrato marco. Se reclaman USD 45,000 correspondientes al 60%% "
+            "del anticipo pagado mas danos por lucro cesante."
+        ),
+        "status": "FILED",
+        "escrow_amount": 45000,
+        "filing_fee": 500,
+        "current_round": 1,
+        "appeal_count": 0,
+        "created_at": (now - timedelta(days=2)).isoformat(),
+        "updated_at": (now - timedelta(days=2)).isoformat(),
+        "contract_result": {"dispute_id": "gl-dispute-0x7a1", "tx_hash": "0xabc123..."},
+    }
+
+    # --- Case 2: DELIBERATION (mid-process) ---
+    case2_id = "case-demo-002"
+    case2 = {
+        "case_id": case2_id,
+        "on_chain_dispute_id": "gl-dispute-0x7a2",
+        "claimant_id": user2["user_id"],
+        "claimant_address": user2["wallet_address"],
+        "claimant_name": user2["display_name"],
+        "respondent_address": user1["wallet_address"],
+        "respondent_name": user1["display_name"],
+        "category": "ip_infringement",
+        "title": "Infraccion de Propiedad Intelectual — Algoritmo de ML",
+        "description": (
+            "El demandante desarrollo un algoritmo propietario de machine learning para "
+            "optimizacion de cadena de suministro, protegido bajo acuerdo de confidencialidad. "
+            "El demandado implemento un sistema sustancialmente identico en su producto "
+            "comercial sin autorizacion ni compensacion. Se solicita cesacion de uso e "
+            "indemnizacion de USD 120,000 por danos y perjuicios."
+        ),
+        "status": "DELIBERATION",
+        "escrow_amount": 120000,
+        "filing_fee": 1200,
+        "current_round": 2,
+        "appeal_count": 0,
+        "created_at": (now - timedelta(days=14)).isoformat(),
+        "updated_at": (now - timedelta(days=1)).isoformat(),
+        "contract_result": {"dispute_id": "gl-dispute-0x7a2", "tx_hash": "0xdef456..."},
+        "ai_analysis": {
+            "strengths_claimant": [
+                "Contrato NDA firmado por ambas partes con fecha anterior al producto del demandado.",
+                "Analisis de codigo muestra un 87%% de similitud estructural entre algoritmos.",
+                "Registro de propiedad intelectual ante autoridad competente.",
+            ],
+            "weaknesses_claimant": [
+                "Parte del algoritmo utiliza librerias open-source de uso comun.",
+                "No se demostro acceso directo al repositorio privado.",
+            ],
+            "strengths_respondent": [
+                "El demandado argumento desarrollo independiente con equipo propio.",
+                "Timeline de commits en su repositorio comienza antes de la relacion comercial.",
+            ],
+            "weaknesses_respondent": [
+                "Tres ingenieros del equipo del demandado trabajaron previamente con el demandante.",
+                "No se presento documentacion de diseno independiente.",
+            ],
+            "preliminary_assessment": "El peso probatorio favorece al demandante en un 68%%. La evidencia de similitud estructural es significativa y el NDA establece restricciones claras. Sin embargo, la defensa de desarrollo independiente tiene merito parcial.",
+            "confidence": 0.72,
+            "deliberation_rounds": [
+                {
+                    "round": 1,
+                    "summary": "Analisis inicial de documentos contractuales y evidencia tecnica.",
+                    "validator_consensus": 0.8,
+                },
+                {
+                    "round": 2,
+                    "summary": "Revision profunda de similitud de codigo y timeline de desarrollo.",
+                    "validator_consensus": 0.75,
+                },
+            ],
+        },
+    }
+
+    # --- Case 3: RESOLVED ---
+    case3_id = "case-demo-003"
+    case3 = {
+        "case_id": case3_id,
+        "on_chain_dispute_id": "gl-dispute-0x7a3",
+        "claimant_id": user1["user_id"],
+        "claimant_address": user1["wallet_address"],
+        "claimant_name": user1["display_name"],
+        "respondent_address": "0xResp0004aaBBccDDeeFF00112233445566778899",
+        "respondent_name": "CloudBridge Payments Ltd.",
+        "category": "fraud",
+        "title": "Fraude en Procesamiento de Pagos — Cobros No Autorizados",
+        "description": (
+            "El proveedor de servicios de pago proceso transacciones duplicadas y cobros "
+            "no autorizados por un monto total de USD 23,500. A pesar de multiples "
+            "reclamos formales, el demandado no ha reembolsado los montos ni ha "
+            "proporcionado documentacion de respaldo para las transacciones disputadas."
+        ),
+        "status": "RESOLVED",
+        "escrow_amount": 23500,
+        "filing_fee": 350,
+        "current_round": 3,
+        "appeal_count": 0,
+        "created_at": (now - timedelta(days=45)).isoformat(),
+        "updated_at": (now - timedelta(days=5)).isoformat(),
+        "contract_result": {"dispute_id": "gl-dispute-0x7a3", "tx_hash": "0xghi789..."},
+        "verdict": {
+            "winner": "claimant",
+            "escrow_split": {"claimant_pct": 85, "respondent_pct": 15},
+            "claimant_amount": 19975,
+            "respondent_amount": 3525,
+            "reasoning": (
+                "La evidencia presentada demuestra de manera contundente que se realizaron "
+                "cobros duplicados sin autorizacion del comerciante. Los registros de la "
+                "blockchain confirman las transacciones disputadas. Se ordena la devolucion "
+                "del 85%% del monto en custodia al demandante."
+            ),
+            "rendered_at": (now - timedelta(days=7)).isoformat(),
+        },
+        "ai_analysis": {
+            "strengths_claimant": [
+                "Registros de transacciones blockchain verificables mostrando duplicados.",
+                "Comunicaciones formales de reclamo con acuse de recibo.",
+                "Peritaje contable independiente confirmando discrepancias.",
+            ],
+            "weaknesses_claimant": [
+                "Demora de 30 dias en presentar el reclamo formal.",
+            ],
+            "strengths_respondent": [
+                "El demandado alego fallo tecnico temporal en el sistema de procesamiento.",
+            ],
+            "weaknesses_respondent": [
+                "No presento logs del sistema ni evidencia del supuesto fallo tecnico.",
+                "Patron de cobros duplicados afecto a multiples comerciantes.",
+                "Incumplimiento de regulaciones de proteccion al consumidor.",
+            ],
+            "preliminary_assessment": "Caso claramente favorable al demandante (92%% de certeza). La evidencia on-chain es irrefutable y el demandado no logro justificar los cobros.",
+            "confidence": 0.92,
+            "deliberation_rounds": [
+                {"round": 1, "summary": "Verificacion de transacciones on-chain.", "validator_consensus": 0.95},
+                {"round": 2, "summary": "Analisis de comunicaciones y reclamos.", "validator_consensus": 0.90},
+                {"round": 3, "summary": "Evaluacion final con peritaje contable.", "validator_consensus": 0.92},
+            ],
+        },
+    }
+
+    db_put_case(case1)
+    db_put_case(case2)
+    db_put_case(case3)
+
+    # --- Evidence for Case 2 ---
+    ev1 = {
+        "evidence_id": "ev-demo-001",
+        "case_id": case2_id,
+        "submitter_id": user2["user_id"],
+        "submitter_address": user2["wallet_address"],
+        "evidence_type": "document",
+        "description": "Acuerdo de Confidencialidad (NDA) firmado entre ambas partes",
+        "file_name": "NDA_Firmado_2025.pdf",
+        "file_hash": "a1b2c3d4e5f6789012345678abcdef0123456789abcdef0123456789abcdef01",
+        "file_size": 245000,
+        "content_type": "application/pdf",
+        "uploaded_at": (now - timedelta(days=12)).isoformat(),
+        "contract_result": {},
+    }
+    ev2 = {
+        "evidence_id": "ev-demo-002",
+        "case_id": case2_id,
+        "submitter_id": user2["user_id"],
+        "submitter_address": user2["wallet_address"],
+        "evidence_type": "expert_report",
+        "description": "Analisis de similitud de codigo por perito independiente",
+        "file_name": "Peritaje_Codigo_Similitud.pdf",
+        "file_hash": "b2c3d4e5f6789012345678abcdef0123456789abcdef0123456789abcdef0102",
+        "file_size": 1240000,
+        "content_type": "application/pdf",
+        "uploaded_at": (now - timedelta(days=10)).isoformat(),
+        "contract_result": {},
+    }
+    ev3 = {
+        "evidence_id": "ev-demo-003",
+        "case_id": case3_id,
+        "submitter_id": user1["user_id"],
+        "submitter_address": user1["wallet_address"],
+        "evidence_type": "transaction",
+        "description": "Registros de transacciones duplicadas en la blockchain",
+        "file_name": "TX_Records_Duplicates.csv",
+        "file_hash": "c3d4e5f6789012345678abcdef0123456789abcdef0123456789abcdef010203",
+        "file_size": 89000,
+        "content_type": "text/csv",
+        "uploaded_at": (now - timedelta(days=40)).isoformat(),
+        "contract_result": {},
+    }
+    ev4 = {
+        "evidence_id": "ev-demo-004",
+        "case_id": case3_id,
+        "submitter_id": user1["user_id"],
+        "submitter_address": user1["wallet_address"],
+        "evidence_type": "communication",
+        "description": "Correos de reclamo formal con acuse de recibo del demandado",
+        "file_name": "Reclamos_Formales.pdf",
+        "file_hash": "d4e5f6789012345678abcdef0123456789abcdef0123456789abcdef01020304",
+        "file_size": 567000,
+        "content_type": "application/pdf",
+        "uploaded_at": (now - timedelta(days=38)).isoformat(),
+        "contract_result": {},
+    }
+    db_put_evidence(ev1)
+    db_put_evidence(ev2)
+    db_put_evidence(ev3)
+    db_put_evidence(ev4)
+
+    # --- Timeline events ---
+    # Case 1
+    add_timeline_event(case1_id, "CASE_FILED", "Caso presentado por Alice Montoya", actor=user1["user_id"])
+
+    # Case 2
+    add_timeline_event(case2_id, "CASE_FILED", "Caso presentado por Roberto Vega", actor=user2["user_id"])
+    add_timeline_event(case2_id, "EVIDENCE_SUBMITTED", "NDA firmado subido como evidencia", actor=user2["user_id"])
+    add_timeline_event(case2_id, "EVIDENCE_SUBMITTED", "Peritaje de codigo subido como evidencia", actor=user2["user_id"])
+    add_timeline_event(case2_id, "AI_ANALYSIS", "Analisis de IA completado — Ronda 1", actor="system")
+    add_timeline_event(case2_id, "DELIBERATION_ADVANCED", "Deliberacion avanzada a ronda 2", actor="system")
+    add_timeline_event(case2_id, "AI_ANALYSIS", "Analisis de IA completado — Ronda 2", actor="system")
+
+    # Case 3
+    add_timeline_event(case3_id, "CASE_FILED", "Caso presentado por Alice Montoya", actor=user1["user_id"])
+    add_timeline_event(case3_id, "EVIDENCE_SUBMITTED", "Registros de transacciones subidos", actor=user1["user_id"])
+    add_timeline_event(case3_id, "EVIDENCE_SUBMITTED", "Correos de reclamo subidos", actor=user1["user_id"])
+    add_timeline_event(case3_id, "AI_ANALYSIS", "Analisis de IA completado — Ronda 1", actor="system")
+    add_timeline_event(case3_id, "DELIBERATION_ADVANCED", "Deliberacion avanzada a ronda 2", actor="system")
+    add_timeline_event(case3_id, "AI_ANALYSIS", "Analisis de IA completado — Ronda 2", actor="system")
+    add_timeline_event(case3_id, "DELIBERATION_ADVANCED", "Deliberacion avanzada a ronda 3", actor="system")
+    add_timeline_event(case3_id, "VERDICT_RENDERED", "Veredicto final emitido — Demandante gana (85/15)", actor="system")
+    add_timeline_event(case3_id, "CASE_RESOLVED", "Caso resuelto — Fondos distribuidos", actor="system")
+
+    logger.info("Demo data seeded successfully: 2 users, 3 cases, 4 evidence items")
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application startup and shutdown logic."""
     UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+    seed_demo_data()
     yield
 
 
@@ -1391,6 +1671,186 @@ async def analytics_categories(user: dict = Depends(get_current_user)):
 # ===================================================================
 #  HEALTH
 # ===================================================================
+
+# ===================================================================
+#  DEMO / PUBLIC ENDPOINTS (no auth required for hackathon demo)
+# ===================================================================
+
+@app.get("/api/demo/cases", tags=["Demo"])
+async def demo_list_cases():
+    """List all cases without authentication (demo mode)."""
+    all_cases = db_all_cases()
+    all_cases.sort(key=lambda x: x["created_at"], reverse=True)
+    return {"cases": all_cases, "total": len(all_cases)}
+
+
+@app.get("/api/demo/cases/{case_id}", tags=["Demo"])
+async def demo_get_case(case_id: str):
+    """Get full case details without authentication (demo mode)."""
+    case = db_get_case(case_id)
+    if not case:
+        raise HTTPException(status_code=404, detail="Case not found")
+    evidence = db_get_evidence(case_id)
+    timeline = db_get_timeline(case_id)
+    return {
+        **case,
+        "evidence": evidence,
+        "evidence_count": len(evidence),
+        "timeline": timeline,
+        "timeline_count": len(timeline),
+    }
+
+
+@app.get("/api/demo/cases/{case_id}/evidence", tags=["Demo"])
+async def demo_list_evidence(case_id: str):
+    """List evidence without auth (demo mode)."""
+    evidence = db_get_evidence(case_id)
+    return {"case_id": case_id, "evidence": evidence, "total": len(evidence)}
+
+
+@app.get("/api/demo/cases/{case_id}/timeline", tags=["Demo"])
+async def demo_get_timeline(case_id: str):
+    """Get timeline without auth (demo mode)."""
+    events = db_get_timeline(case_id)
+    return {"case_id": case_id, "events": events, "total": len(events)}
+
+
+@app.get("/api/demo/analytics", tags=["Demo"])
+async def demo_analytics():
+    """Platform analytics without auth (demo mode)."""
+    all_cases = db_all_cases()
+    total = len(all_cases)
+    by_status: dict[str, int] = {}
+    by_category: dict[str, int] = {}
+    total_escrow = 0
+    resolved_cases = []
+
+    for c in all_cases:
+        st = c["status"]
+        by_status[st] = by_status.get(st, 0) + 1
+        cat = c["category"]
+        by_category[cat] = by_category.get(cat, 0) + 1
+        total_escrow += c.get("escrow_amount", 0)
+        if st == "RESOLVED":
+            resolved_cases.append(c)
+
+    resolution_rate = (len(resolved_cases) / total * 100) if total > 0 else 0
+
+    return {
+        "total_cases": total,
+        "cases_by_status": by_status,
+        "cases_by_category": by_category,
+        "total_escrow_value": total_escrow,
+        "resolution_rate_pct": round(resolution_rate, 2),
+        "resolved_count": len(resolved_cases),
+        "active_count": total - len(resolved_cases),
+    }
+
+
+@app.get("/api/demo/users", tags=["Demo"])
+async def demo_users():
+    """List demo users (no passwords) for demo mode."""
+    users = db_all_users()
+    return {
+        "users": [
+            {
+                "user_id": u["user_id"],
+                "email": u["email"],
+                "display_name": u["display_name"],
+                "wallet_address": u["wallet_address"],
+                "created_at": u["created_at"],
+            }
+            for u in users
+        ]
+    }
+
+
+@app.get("/api/demo/reputation/{wallet_address}", tags=["Demo"])
+async def demo_reputation(wallet_address: str):
+    """Get reputation for demo mode with realistic data."""
+    # Return pre-computed demo reputation
+    demo_reputations = {
+        "0xAlice0001aaBBccDDeeFF00112233445566778899": {
+            "address": "0xAlice0001aaBBccDDeeFF00112233445566778899",
+            "display_name": "Alice Montoya",
+            "score": 1847,
+            "cases_filed": 2,
+            "cases_responded": 1,
+            "cases_won": 1,
+            "cases_lost": 0,
+            "cases_active": 2,
+            "compliance_score": 95,
+            "total_value_recovered": 19975,
+            "win_rate": 100,
+        },
+        "0xBob00002aaBBccDDeeFF00112233445566778899": {
+            "address": "0xBob00002aaBBccDDeeFF00112233445566778899",
+            "display_name": "Roberto Vega",
+            "score": 1623,
+            "cases_filed": 1,
+            "cases_responded": 0,
+            "cases_won": 0,
+            "cases_lost": 0,
+            "cases_active": 1,
+            "compliance_score": 88,
+            "total_value_recovered": 0,
+            "win_rate": 0,
+        },
+    }
+    rep = demo_reputations.get(wallet_address)
+    if rep:
+        return rep
+    return {
+        "address": wallet_address,
+        "score": 500,
+        "cases_filed": 0,
+        "cases_responded": 0,
+        "cases_won": 0,
+        "cases_lost": 0,
+        "compliance_score": 100,
+    }
+
+
+@app.post("/api/demo/cases", tags=["Demo"], status_code=201)
+async def demo_create_case(body: CaseCreate):
+    """Create a case without authentication (demo mode)."""
+    case_id = str(uuid.uuid4())
+    case = {
+        "case_id": case_id,
+        "on_chain_dispute_id": f"gl-dispute-{case_id[:8]}",
+        "claimant_id": "usr-demo-alice-001",
+        "claimant_address": "0xAlice0001aaBBccDDeeFF00112233445566778899",
+        "claimant_name": "Alice Montoya",
+        "respondent_address": body.respondent_address,
+        "respondent_name": "Parte Demandada",
+        "category": body.category.value,
+        "title": body.title,
+        "description": body.description,
+        "status": "FILED",
+        "escrow_amount": body.escrow_amount,
+        "filing_fee": body.filing_fee,
+        "current_round": 1,
+        "appeal_count": 0,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "updated_at": datetime.now(timezone.utc).isoformat(),
+        "contract_result": {"dispute_id": f"gl-dispute-{case_id[:8]}", "tx_hash": f"0x{case_id[:16]}..."},
+    }
+    db_put_case(case)
+    add_timeline_event(case_id, "CASE_FILED", "Caso presentado (modo demo)", actor="usr-demo-alice-001")
+    return case
+
+
+@app.get("/api/demo/all-evidence", tags=["Demo"])
+async def demo_all_evidence():
+    """List all evidence across all cases (demo mode)."""
+    all_ev = db_all_evidence()
+    flat = []
+    for case_id, evs in all_ev.items():
+        for e in evs:
+            flat.append(e)
+    flat.sort(key=lambda x: x.get("uploaded_at", ""), reverse=True)
+    return {"evidence": flat, "total": len(flat)}
+
 
 @app.get("/api/health", tags=["System"])
 async def health():

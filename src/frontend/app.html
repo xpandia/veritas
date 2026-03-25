@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Veritas — Arbitraje Descentralizado con IA</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d0d1a;--bg2:#1a1a2e;--bg3:#16213e;--bg4:#1e2a4a;
+  --blue:#0066ff;--blue2:#0052cc;--blue3:#3388ff;--blue-glow:rgba(0,102,255,.15);
+  --green:#00c853;--yellow:#ffc107;--purple:#9c27b0;--red:#ef5350;--orange:#ff9800;
+  --text:#e8eaf6;--text2:#9ea7c0;--text3:#5c6784;
+  --border:#2a2a4a;--radius:12px;--radius-sm:8px;
+  --shadow:0 4px 24px rgba(0,0,0,.4);
+  --transition:all .2s ease;
+}
+html{font-size:14px}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);overflow:hidden;height:100vh}
+a{color:var(--blue3);text-decoration:none}
+button{cursor:pointer;font-family:inherit}
+input,select,textarea{font-family:inherit;font-size:.95rem}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* LAYOUT */
+.app{display:flex;height:100vh;width:100vw}
+.sidebar{width:240px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;z-index:10}
+.main{flex:1;overflow-y:auto;padding:32px 40px}
+
+/* SIDEBAR */
+.sidebar-logo{padding:24px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border)}
+.sidebar-logo svg{width:32px;height:32px}
+.sidebar-logo h1{font-size:1.2rem;font-weight:700;letter-spacing:1px;background:linear-gradient(135deg,var(--blue),var(--blue3));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.sidebar-logo span{font-size:.65rem;color:var(--text3);letter-spacing:2px;text-transform:uppercase;display:block;margin-top:2px}
+.sidebar-nav{flex:1;padding:12px 0}
+.nav-item{display:flex;align-items:center;gap:14px;padding:13px 24px;color:var(--text2);font-size:.9rem;font-weight:500;cursor:pointer;transition:var(--transition);border-left:3px solid transparent;letter-spacing:.3px}
+.nav-item:hover{background:var(--blue-glow);color:var(--text)}
+.nav-item.active{background:var(--blue-glow);color:var(--blue3);border-left-color:var(--blue)}
+.nav-item .icon{font-size:1.1rem;width:22px;text-align:center}
+.sidebar-footer{padding:16px 20px;border-top:1px solid var(--border);font-size:.7rem;color:var(--text3);text-align:center}
+.sidebar-footer span{color:var(--blue3)}
+
+/* HEADER */
+.page-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:32px}
+.page-header h2{font-size:1.6rem;font-weight:700;letter-spacing:-.5px}
+.page-header p{color:var(--text2);font-size:.85rem;margin-top:4px}
+
+/* CARDS */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:24px;transition:var(--transition)}
+.card:hover{border-color:var(--blue);box-shadow:0 0 20px var(--blue-glow)}
+.card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px}
+
+/* GRID */
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+.grid-1{display:grid;grid-template-columns:1fr;gap:20px}
+@media(max-width:1200px){.grid-4{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:800px){.grid-4,.grid-3,.grid-2{grid-template-columns:1fr}.sidebar{width:60px}.sidebar .nav-label,.sidebar-logo h1,.sidebar-logo span,.sidebar-footer{display:none}.nav-item{padding:13px 0;justify-content:center}.sidebar-logo{justify-content:center;padding:16px 0}}
+
+/* STATS */
+.stat-card{text-align:center;padding:28px 20px}
+.stat-card .stat-icon{font-size:1.8rem;margin-bottom:10px}
+.stat-card .stat-value{font-size:2rem;font-weight:800;letter-spacing:-1px;background:linear-gradient(135deg,var(--text),var(--blue3));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat-card .stat-label{font-size:.75rem;color:var(--text2);text-transform:uppercase;letter-spacing:1.5px;margin-top:6px}
+.stat-card.highlight{border-color:var(--blue);background:linear-gradient(135deg,var(--bg2),var(--bg3))}
+.stat-card.highlight .stat-value{background:linear-gradient(135deg,var(--blue),var(--blue3));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+
+/* STATUS PILLS */
+.pill{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:20px;font-size:.7rem;font-weight:600;letter-spacing:.5px;text-transform:uppercase}
+.pill-filed{background:rgba(255,193,7,.12);color:#ffc107}
+.pill-evidence{background:rgba(0,102,255,.12);color:#3388ff}
+.pill-deliberation{background:rgba(156,39,176,.12);color:#ce93d8}
+.pill-resolved{background:rgba(0,200,83,.12);color:#00c853}
+.pill-verdict{background:rgba(255,152,0,.12);color:#ff9800}
+.pill-appeal{background:rgba(255,255,255,.1);color:#ccc}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 24px;border-radius:var(--radius-sm);font-size:.85rem;font-weight:600;border:none;transition:var(--transition);letter-spacing:.3px}
+.btn-primary{background:var(--blue);color:#fff}
+.btn-primary:hover{background:var(--blue2);transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,102,255,.3)}
+.btn-secondary{background:transparent;color:var(--text2);border:1px solid var(--border)}
+.btn-secondary:hover{border-color:var(--blue);color:var(--text)}
+.btn-sm{padding:6px 16px;font-size:.78rem}
+.btn-danger{background:rgba(239,83,80,.15);color:var(--red);border:1px solid rgba(239,83,80,.3)}
+.btn-danger:hover{background:rgba(239,83,80,.25)}
+
+/* CASE LIST */
+.case-card{padding:20px 24px;cursor:pointer;margin-bottom:12px}
+.case-card .case-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.case-card .case-title{font-size:1rem;font-weight:600;margin-bottom:4px}
+.case-card .case-meta{display:flex;gap:20px;color:var(--text2);font-size:.78rem}
+.case-card .case-meta span{display:flex;align-items:center;gap:5px}
+.case-card .case-parties{display:flex;gap:16px;margin-top:10px;font-size:.78rem;color:var(--text2)}
+.case-card .case-parties .party{display:flex;align-items:center;gap:6px}
+.case-card .case-parties .vs{color:var(--text3);font-weight:600}
+
+/* CASE DETAIL */
+.case-detail-header{margin-bottom:28px}
+.case-detail-header h3{font-size:1.35rem;font-weight:700;margin-bottom:8px}
+.back-btn{display:flex;align-items:center;gap:6px;color:var(--text2);font-size:.82rem;cursor:pointer;margin-bottom:16px;transition:var(--transition)}
+.back-btn:hover{color:var(--blue3)}
+.detail-meta{display:flex;flex-wrap:wrap;gap:24px;margin-top:12px}
+.detail-meta .dm-item{display:flex;flex-direction:column;gap:2px}
+.detail-meta .dm-label{font-size:.68rem;color:var(--text3);text-transform:uppercase;letter-spacing:1px}
+.detail-meta .dm-value{font-size:.92rem;font-weight:600}
+
+/* TIMELINE */
+.timeline{position:relative;padding-left:28px}
+.timeline::before{content:'';position:absolute;left:9px;top:0;bottom:0;width:2px;background:var(--border)}
+.timeline-item{position:relative;margin-bottom:20px;padding-left:20px}
+.timeline-item::before{content:'';position:absolute;left:-22px;top:6px;width:12px;height:12px;border-radius:50%;background:var(--bg3);border:2px solid var(--blue);z-index:1}
+.timeline-item.system::before{border-color:var(--green)}
+.timeline-item .tl-type{font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--blue3);margin-bottom:3px}
+.timeline-item .tl-desc{font-size:.88rem;color:var(--text)}
+.timeline-item .tl-time{font-size:.72rem;color:var(--text3);margin-top:3px}
+
+/* GAUGE */
+.gauge-container{display:flex;flex-direction:column;align-items:center;gap:8px}
+.gauge{position:relative;width:140px;height:140px}
+.gauge svg{transform:rotate(-90deg)}
+.gauge circle{fill:none;stroke-width:10;stroke-linecap:round}
+.gauge .gauge-bg{stroke:var(--border)}
+.gauge .gauge-fill{transition:stroke-dashoffset .8s ease}
+.gauge .gauge-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.gauge .gauge-text .gval{font-size:1.8rem;font-weight:800;color:var(--text)}
+.gauge .gauge-text .glabel{font-size:.65rem;color:var(--text2);text-transform:uppercase;letter-spacing:1px}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:100;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
+.modal-overlay.active{opacity:1;pointer-events:auto}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);width:560px;max-height:85vh;overflow-y:auto;padding:32px}
+.modal h3{font-size:1.2rem;font-weight:700;margin-bottom:20px}
+.form-group{margin-bottom:18px}
+.form-group label{display:block;font-size:.78rem;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);transition:var(--transition)}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-glow)}
+.form-group textarea{resize:vertical;min-height:100px}
+.form-group select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%239ea7c0' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.form-actions{display:flex;justify-content:flex-end;gap:12px;margin-top:24px}
+
+/* ANALYSIS */
+.analysis-section{margin-bottom:24px}
+.analysis-section h4{font-size:.85rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.strength-item,.weakness-item{padding:10px 14px;border-radius:var(--radius-sm);margin-bottom:8px;font-size:.85rem;line-height:1.5;display:flex;align-items:flex-start;gap:10px}
+.strength-item{background:rgba(0,200,83,.08);border-left:3px solid var(--green);color:var(--text)}
+.weakness-item{background:rgba(239,83,80,.08);border-left:3px solid var(--red);color:var(--text)}
+.assessment-box{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:20px;font-size:.9rem;line-height:1.7;color:var(--text)}
+.confidence-bar{height:8px;border-radius:4px;background:var(--border);overflow:hidden;margin-top:8px}
+.confidence-bar .fill{height:100%;border-radius:4px;transition:width .6s ease}
+
+/* PIE CHART (CSS) */
+.pie-chart{width:180px;height:180px;border-radius:50%;position:relative;margin:0 auto}
+.pie-legend{display:flex;flex-direction:column;gap:8px;margin-top:16px}
+.pie-legend-item{display:flex;align-items:center;gap:8px;font-size:.82rem}
+.pie-legend-item .dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+
+/* EVIDENCE TABLE */
+.evidence-table{width:100%;border-collapse:separate;border-spacing:0}
+.evidence-table th{text-align:left;font-size:.7rem;text-transform:uppercase;letter-spacing:1px;color:var(--text3);padding:10px 16px;border-bottom:1px solid var(--border)}
+.evidence-table td{padding:12px 16px;border-bottom:1px solid rgba(42,42,74,.5);font-size:.85rem}
+.evidence-table tr:hover td{background:var(--blue-glow)}
+.type-badge{padding:3px 10px;border-radius:12px;font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.type-document{background:rgba(0,102,255,.12);color:var(--blue3)}
+.type-communication{background:rgba(156,39,176,.12);color:#ce93d8}
+.type-transaction{background:rgba(0,200,83,.12);color:var(--green)}
+.type-testimony{background:rgba(255,193,7,.12);color:var(--yellow)}
+.type-expert_report{background:rgba(255,152,0,.12);color:var(--orange)}
+
+/* TABS (for inner views) */
+.tab-bar{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:24px}
+.tab-btn{padding:10px 20px;font-size:.82rem;font-weight:600;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:var(--transition)}
+.tab-btn:hover{color:var(--text2)}
+.tab-btn.active{color:var(--blue3);border-bottom-color:var(--blue)}
+
+/* ACTIVITY FEED */
+.activity-item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid rgba(42,42,74,.4)}
+.activity-item:last-child{border-bottom:none}
+.activity-dot{width:8px;height:8px;border-radius:50%;background:var(--blue);margin-top:6px;flex-shrink:0}
+.activity-item .act-title{font-size:.85rem;font-weight:500;margin-bottom:2px}
+.activity-item .act-time{font-size:.72rem;color:var(--text3)}
+
+/* PROFILE */
+.profile-header{display:flex;align-items:center;gap:24px;margin-bottom:32px}
+.avatar{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--purple));display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:700;color:#fff;flex-shrink:0}
+.profile-info h3{font-size:1.3rem;font-weight:700;margin-bottom:4px}
+.profile-info .wallet{font-size:.75rem;color:var(--text3);font-family:monospace}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:60px 20px;color:var(--text3)}
+.empty-state .empty-icon{font-size:3rem;margin-bottom:16px}
+.empty-state p{font-size:.9rem;margin-bottom:20px}
+
+/* LOADING */
+.loading{display:flex;align-items:center;justify-content:center;padding:40px;color:var(--text2)}
+.spinner{width:24px;height:24px;border:3px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite;margin-right:12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* VERDICT PIE */
+.verdict-split{display:flex;align-items:center;gap:32px;padding:20px}
+.verdict-pie{width:120px;height:120px;border-radius:50%;position:relative;flex-shrink:0}
+.verdict-details{flex:1}
+.verdict-details .vd-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(42,42,74,.4);font-size:.88rem}
+.verdict-details .vd-row:last-child{border-bottom:none}
+
+/* ANALYTICS */
+.analytics-bar{display:flex;align-items:flex-end;gap:8px;height:120px;padding:0 8px}
+.analytics-bar .bar{flex:1;background:var(--blue);border-radius:4px 4px 0 0;min-height:4px;transition:height .4s ease;position:relative}
+.analytics-bar .bar:hover{background:var(--blue3)}
+.analytics-bar .bar-label{position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);font-size:.6rem;color:var(--text3);white-space:nowrap}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--bg3);border:1px solid var(--blue);border-radius:var(--radius-sm);padding:14px 24px;color:var(--text);font-size:.85rem;z-index:200;transform:translateY(100px);opacity:0;transition:all .3s ease}
+.toast.show{transform:translateY(0);opacity:1}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <svg viewBox="0 0 32 32" fill="none"><path d="M16 2L4 8v8c0 7.7 5.1 14.9 12 16.8C22.9 30.9 28 23.7 28 16V8L16 2z" fill="#0066ff" opacity=".2"/><path d="M16 2L4 8v8c0 7.7 5.1 14.9 12 16.8C22.9 30.9 28 23.7 28 16V8L16 2z" stroke="#0066ff" stroke-width="1.5" fill="none"/><path d="M12 16l3 3 6-6" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div>
+        <h1>VERITAS</h1>
+        <span>Arbitraje con IA</span>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-item active" data-tab="dashboard"><span class="icon">&#127968;</span><span class="nav-label">Dashboard</span></div>
+      <div class="nav-item" data-tab="cases"><span class="icon">&#9878;</span><span class="nav-label">Casos</span></div>
+      <div class="nav-item" data-tab="evidence"><span class="icon">&#128193;</span><span class="nav-label">Evidencia</span></div>
+      <div class="nav-item" data-tab="analysis"><span class="icon">&#129302;</span><span class="nav-label">Analisis IA</span></div>
+      <div class="nav-item" data-tab="analytics"><span class="icon">&#128202;</span><span class="nav-label">Analiticas</span></div>
+      <div class="nav-item" data-tab="profile"><span class="icon">&#128100;</span><span class="nav-label">Perfil</span></div>
+    </nav>
+    <div class="sidebar-footer">Powered by <span>GenLayer</span><br>Testnet Bradbury</div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main" id="main-content"></main>
+</div>
+
+<!-- NEW CASE MODAL -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <h3>&#9878;&#65039; Nuevo Caso de Arbitraje</h3>
+    <div class="form-group">
+      <label>Categoria de Disputa</label>
+      <select id="case-category">
+        <option value="contract_breach">Incumplimiento de Contrato</option>
+        <option value="ip_infringement">Propiedad Intelectual</option>
+        <option value="fraud">Fraude</option>
+        <option value="service_dispute">Disputa de Servicios</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Titulo del Caso</label>
+      <input type="text" id="case-title" placeholder="Describa brevemente la disputa..." maxlength="200">
+    </div>
+    <div class="form-group">
+      <label>Direccion del Demandado</label>
+      <input type="text" id="case-respondent" placeholder="0x..." maxlength="42">
+    </div>
+    <div class="form-group">
+      <label>Monto en Disputa (USD)</label>
+      <input type="number" id="case-amount" placeholder="25000" min="0">
+    </div>
+    <div class="form-group">
+      <label>Descripcion Detallada</label>
+      <textarea id="case-description" placeholder="Describa los hechos, circunstancias y fundamentos de su reclamo..." maxlength="5000"></textarea>
+    </div>
+    <div class="form-group">
+      <label>Evidencia Inicial (opcional)</label>
+      <input type="file" id="case-evidence" style="padding:8px" multiple>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="submitCase()">&#128220; Presentar Caso</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+const API = 'http://localhost:8000/api/demo';
+
+let state = {
+  cases: [],
+  evidence: [],
+  analytics: null,
+  users: [],
+  currentTab: 'dashboard',
+  selectedCase: null,
+  selectedAnalysisCase: null,
+};
+
+// --- API CALLS ---
+async function fetchJSON(url) {
+  try {
+    const r = await fetch(url);
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    return await r.json();
+  } catch(e) {
+    console.error('API Error:', url, e);
+    return null;
+  }
+}
+
+async function loadData() {
+  const [casesData, evidenceData, analyticsData, usersData] = await Promise.all([
+    fetchJSON(`${API}/cases`),
+    fetchJSON(`${API}/all-evidence`),
+    fetchJSON(`${API}/analytics`),
+    fetchJSON(`${API}/users`),
+  ]);
+  state.cases = casesData?.cases || [];
+  state.evidence = evidenceData?.evidence || [];
+  state.analytics = analyticsData || {};
+  state.users = usersData?.users || [];
+}
+
+// --- NAVIGATION ---
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    item.classList.add('active');
+    state.currentTab = item.dataset.tab;
+    state.selectedCase = null;
+    render();
+  });
+});
+
+// --- RENDER ---
+function render() {
+  const main = document.getElementById('main-content');
+  switch(state.currentTab) {
+    case 'dashboard': main.innerHTML = renderDashboard(); break;
+    case 'cases': main.innerHTML = state.selectedCase ? renderCaseDetail() : renderCasesList(); break;
+    case 'evidence': main.innerHTML = renderEvidence(); break;
+    case 'analysis': main.innerHTML = state.selectedAnalysisCase ? renderAnalysisDetail() : renderAnalysis(); break;
+    case 'analytics': main.innerHTML = renderAnalytics(); break;
+    case 'profile': main.innerHTML = renderProfile(); break;
+  }
+  bindEvents();
+}
+
+// --- STATUS HELPERS ---
+function statusPill(s) {
+  const map = {
+    'FILED': ['pill-filed', 'Presentado'],
+    'EVIDENCE_SUBMISSION': ['pill-evidence', 'Evidencia'],
+    'DELIBERATION': ['pill-deliberation', 'Deliberacion'],
+    'VERDICT': ['pill-verdict', 'Veredicto'],
+    'RESOLVED': ['pill-resolved', 'Resuelto'],
+    'APPEAL': ['pill-appeal', 'Apelado'],
+  };
+  const [cls, label] = map[s] || ['pill-filed', s];
+  return `<span class="pill ${cls}">${label}</span>`;
+}
+
+function statusIcon(s) {
+  const map = { FILED:'\u{1F7E1}', EVIDENCE_SUBMISSION:'\u{1F535}', DELIBERATION:'\u{1F7E3}', VERDICT:'\u{1F7E0}', RESOLVED:'\u{1F7E2}', APPEAL:'\u26AA' };
+  return map[s] || '\u26AA';
+}
+
+function categoryLabel(c) {
+  const map = { contract_breach:'Contrato', ip_infringement:'Propiedad Intelectual', fraud:'Fraude', service_dispute:'Servicios', other:'Otro' };
+  return map[c] || c;
+}
+
+function formatDate(iso) {
+  if (!iso) return '-';
+  const d = new Date(iso);
+  return d.toLocaleDateString('es-ES', { day:'2-digit', month:'short', year:'numeric' });
+}
+
+function formatMoney(n) {
+  return new Intl.NumberFormat('en-US', { style:'currency', currency:'USD', maximumFractionDigits:0 }).format(n || 0);
+}
+
+function shortAddr(a) {
+  if (!a || a.length < 12) return a || '-';
+  return a.slice(0,6) + '...' + a.slice(-4);
+}
+
+function shortHash(h) {
+  if (!h || h.length < 16) return h || '-';
+  return h.slice(0,8) + '...' + h.slice(-8);
+}
+
+// --- DASHBOARD ---
+function renderDashboard() {
+  const active = state.cases.filter(c => c.status !== 'RESOLVED').length;
+  const resolved = state.cases.filter(c => c.status === 'RESOLVED').length;
+  const totalEscrow = state.cases.reduce((s,c) => s + (c.escrow_amount||0), 0);
+  const won = state.cases.filter(c => c.verdict?.winner === 'claimant').length;
+  const winRate = state.cases.length > 0 ? Math.round((won / Math.max(resolved,1)) * 100) : 0;
+
+  const recentEvents = [];
+  state.cases.forEach(c => {
+    recentEvents.push({ title: c.title, status: c.status, date: c.updated_at || c.created_at, caseId: c.case_id });
+  });
+  recentEvents.sort((a,b) => new Date(b.date) - new Date(a.date));
+
+  return `
+    <div class="page-header">
+      <div>
+        <h2>Dashboard</h2>
+        <p>Vista general de la plataforma de arbitraje</p>
+      </div>
+      <button class="btn btn-primary" onclick="openModal()">&#10010; Nuevo Caso</button>
+    </div>
+
+    <div class="grid-4" style="margin-bottom:28px">
+      <div class="card stat-card highlight">
+        <div class="stat-icon">&#9878;&#65039;</div>
+        <div class="stat-value">${active}</div>
+        <div class="stat-label">Casos Activos</div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-icon">&#9989;</div>
+        <div class="stat-value">${resolved}</div>
+        <div class="stat-label">Casos Resueltos</div>
+      </div>
+      <div class="card stat-card highlight">
+        <div class="stat-icon">&#128176;</div>
+        <div class="stat-value">${formatMoney(totalEscrow)}</div>
+        <div class="stat-label">Valor Total Arbitrado</div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-icon">&#127942;</div>
+        <div class="stat-value">${winRate}%</div>
+        <div class="stat-label">Tasa de Exito</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <h4 style="margin-bottom:16px;font-size:.9rem;font-weight:700">&#128200; Reputacion</h4>
+        <div class="gauge-container">
+          <div class="gauge">
+            <svg width="140" height="140" viewBox="0 0 140 140">
+              <circle class="gauge-bg" cx="70" cy="70" r="60"/>
+              <circle class="gauge-fill" cx="70" cy="70" r="60"
+                stroke="${getGaugeColor(1847)}"
+                stroke-dasharray="${2 * Math.PI * 60}"
+                stroke-dashoffset="${2 * Math.PI * 60 * (1 - 1847/2500)}"/>
+            </svg>
+            <div class="gauge-text">
+              <div class="gval">1,847</div>
+              <div class="glabel">ELO Score</div>
+            </div>
+          </div>
+          <div style="font-size:.75rem;color:var(--text2)">Top 8% de arbitradores</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h4 style="margin-bottom:16px;font-size:.9rem;font-weight:700">&#128340; Actividad Reciente</h4>
+        ${recentEvents.slice(0,5).map(e => `
+          <div class="activity-item">
+            <div class="activity-dot" style="background:${e.status==='RESOLVED'?'var(--green)':e.status==='DELIBERATION'?'var(--purple)':'var(--yellow)'}"></div>
+            <div>
+              <div class="act-title">${e.title.length > 50 ? e.title.slice(0,50)+'...' : e.title}</div>
+              <div class="act-time">${statusPill(e.status)} &middot; ${formatDate(e.date)}</div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function getGaugeColor(score) {
+  if (score >= 1500) return 'var(--green)';
+  if (score >= 1000) return 'var(--blue)';
+  if (score >= 500) return 'var(--yellow)';
+  return 'var(--red)';
+}
+
+// --- CASES LIST ---
+function renderCasesList() {
+  return `
+    <div class="page-header">
+      <div>
+        <h2>Casos de Arbitraje</h2>
+        <p>${state.cases.length} caso${state.cases.length!==1?'s':''} en la plataforma</p>
+      </div>
+      <button class="btn btn-primary" onclick="openModal()">&#10010; Nuevo Caso</button>
+    </div>
+
+    <div class="tab-bar" style="margin-bottom:20px">
+      <div class="tab-btn active" data-filter="all">Todos</div>
+      <div class="tab-btn" data-filter="FILED">Presentados</div>
+      <div class="tab-btn" data-filter="DELIBERATION">En Deliberacion</div>
+      <div class="tab-btn" data-filter="RESOLVED">Resueltos</div>
+    </div>
+
+    <div id="cases-list">
+      ${state.cases.map(c => renderCaseCard(c)).join('')}
+    </div>
+  `;
+}
+
+function renderCaseCard(c) {
+  return `
+    <div class="card case-card" data-case-id="${c.case_id}">
+      <div class="case-top">
+        <div>
+          <div class="case-title">${c.title}</div>
+          <div class="case-parties">
+            <span class="party">&#128100; ${c.claimant_name || shortAddr(c.claimant_address)}</span>
+            <span class="vs">vs</span>
+            <span class="party">&#128101; ${c.respondent_name || shortAddr(c.respondent_address)}</span>
+          </div>
+        </div>
+        ${statusPill(c.status)}
+      </div>
+      <div class="case-meta">
+        <span>&#128181; ${formatMoney(c.escrow_amount)}</span>
+        <span>&#128197; ${formatDate(c.created_at)}</span>
+        <span>&#127991;&#65039; ${categoryLabel(c.category)}</span>
+        <span>&#128260; Ronda ${c.current_round || 1}</span>
+      </div>
+    </div>
+  `;
+}
+
+// --- CASE DETAIL ---
+function renderCaseDetail() {
+  const c = state.selectedCase;
+  if (!c) return '';
+  const evidence = state.evidence.filter(e => e.case_id === c.case_id);
+  const analysis = c.ai_analysis;
+  const verdict = c.verdict;
+
+  return `
+    <div class="back-btn" onclick="state.selectedCase=null;render()">&#8592; Volver a Casos</div>
+
+    <div class="case-detail-header">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <h3>${c.title}</h3>
+        ${statusPill(c.status)}
+      </div>
+      <div class="detail-meta">
+        <div class="dm-item"><span class="dm-label">ID del Caso</span><span class="dm-value" style="font-family:monospace;font-size:.78rem">${c.case_id.slice(0,16)}...</span></div>
+        <div class="dm-item"><span class="dm-label">Categoria</span><span class="dm-value">${categoryLabel(c.category)}</span></div>
+        <div class="dm-item"><span class="dm-label">Escrow</span><span class="dm-value" style="color:var(--blue3)">${formatMoney(c.escrow_amount)}</span></div>
+        <div class="dm-item"><span class="dm-label">Ronda</span><span class="dm-value">${c.current_round || 1}</span></div>
+        <div class="dm-item"><span class="dm-label">Presentado</span><span class="dm-value">${formatDate(c.created_at)}</span></div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:24px">
+      <div class="card">
+        <h4 style="font-size:.85rem;font-weight:700;margin-bottom:12px">&#128100; Partes</h4>
+        <div style="margin-bottom:12px">
+          <div style="font-size:.7rem;color:var(--text3);text-transform:uppercase;margin-bottom:4px">Demandante</div>
+          <div style="font-weight:600">${c.claimant_name || 'Demandante'}</div>
+          <div style="font-size:.75rem;color:var(--text3);font-family:monospace">${shortAddr(c.claimant_address)}</div>
+        </div>
+        <div>
+          <div style="font-size:.7rem;color:var(--text3);text-transform:uppercase;margin-bottom:4px">Demandado</div>
+          <div style="font-weight:600">${c.respondent_name || 'Demandado'}</div>
+          <div style="font-size:.75rem;color:var(--text3);font-family:monospace">${shortAddr(c.respondent_address)}</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h4 style="font-size:.85rem;font-weight:700;margin-bottom:12px">&#128196; Descripcion</h4>
+        <p style="font-size:.85rem;line-height:1.7;color:var(--text2)">${c.description}</p>
+      </div>
+    </div>
+
+    ${evidence.length > 0 ? `
+    <div class="card" style="margin-bottom:24px">
+      <h4 style="font-size:.85rem;font-weight:700;margin-bottom:16px">&#128193; Evidencia (${evidence.length})</h4>
+      <table class="evidence-table">
+        <thead><tr><th>Documento</th><th>Tipo</th><th>Hash</th><th>Fecha</th></tr></thead>
+        <tbody>
+        ${evidence.map(e => `
+          <tr>
+            <td style="font-weight:500">${e.file_name}</td>
+            <td><span class="type-badge type-${e.evidence_type}">${e.evidence_type}</span></td>
+            <td style="font-family:monospace;font-size:.75rem;color:var(--text3)">${shortHash(e.file_hash)}</td>
+            <td style="color:var(--text2)">${formatDate(e.uploaded_at)}</td>
+          </tr>
+        `).join('')}
+        </tbody>
+      </table>
+    </div>` : ''}
+
+    ${analysis ? renderAnalysisSection(analysis) : ''}
+
+    ${verdict ? renderVerdictSection(verdict, c) : ''}
+
+    ${c._timeline ? renderTimelineSection(c._timeline) : '<div class="card" style="margin-bottom:24px"><h4 style="font-size:.85rem;font-weight:700;margin-bottom:12px">&#128197; Linea de Tiempo</h4><div class="loading"><div class="spinner"></div>Cargando timeline...</div></div>'}
+
+    ${c.status === 'VERDICT' ? `
+    <div style="text-align:right;margin-top:16px">
+      <button class="btn btn-danger">&#128260; Apelar Veredicto</button>
+    </div>` : ''}
+  `;
+}
+
+function renderAnalysisSection(a) {
+  return `
+    <div class="card" style="margin-bottom:24px">
+      <h4 style="font-size:.85rem;font-weight:700;margin-bottom:20px">&#129302; Analisis de IA</h4>
+
+      <div class="grid-2" style="margin-bottom:20px">
+        <div class="analysis-section">
+          <h4 style="color:var(--green)">&#9989; Fortalezas del Demandante</h4>
+          ${(a.strengths_claimant||[]).map(s => `<div class="strength-item">&#8226; ${s}</div>`).join('')}
+        </div>
+        <div class="analysis-section">
+          <h4 style="color:var(--red)">&#10060; Debilidades del Demandante</h4>
+          ${(a.weaknesses_claimant||[]).map(s => `<div class="weakness-item">&#8226; ${s}</div>`).join('')}
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom:20px">
+        <div class="analysis-section">
+          <h4 style="color:var(--green)">&#9989; Fortalezas del Demandado</h4>
+          ${(a.strengths_respondent||[]).map(s => `<div class="strength-item">&#8226; ${s}</div>`).join('')}
+        </div>
+        <div class="analysis-section">
+          <h4 style="color:var(--red)">&#10060; Debilidades del Demandado</h4>
+          ${(a.weaknesses_respondent||[]).map(s => `<div class="weakness-item">&#8226; ${s}</div>`).join('')}
+        </div>
+      </div>
+
+      <div class="assessment-box" style="margin-bottom:16px">
+        <strong style="color:var(--blue3)">Evaluacion Preliminar:</strong><br>
+        ${a.preliminary_assessment || 'Sin evaluacion disponible.'}
+      </div>
+
+      <div style="margin-bottom:16px">
+        <div style="display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:4px">
+          <span>Nivel de Confianza</span>
+          <span style="font-weight:700;color:${a.confidence >= 0.8 ? 'var(--green)' : a.confidence >= 0.6 ? 'var(--yellow)' : 'var(--red)'}">${Math.round((a.confidence||0)*100)}%</span>
+        </div>
+        <div class="confidence-bar">
+          <div class="fill" style="width:${(a.confidence||0)*100}%;background:${a.confidence >= 0.8 ? 'var(--green)' : a.confidence >= 0.6 ? 'var(--yellow)' : 'var(--red)'}"></div>
+        </div>
+      </div>
+
+      ${a.deliberation_rounds ? `
+      <h4 style="font-size:.8rem;font-weight:700;margin-bottom:12px;margin-top:20px">Rondas de Deliberacion</h4>
+      ${a.deliberation_rounds.map(r => `
+        <div class="card" style="margin-bottom:8px;padding:14px 18px;background:var(--bg)">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <span style="font-weight:700;color:var(--blue3)">Ronda ${r.round}</span>
+              <span style="color:var(--text2);font-size:.82rem;margin-left:12px">${r.summary}</span>
+            </div>
+            <div style="font-size:.78rem;color:${r.validator_consensus >= 0.85 ? 'var(--green)' : 'var(--yellow)'}">
+              Consenso: ${Math.round(r.validator_consensus*100)}%
+            </div>
+          </div>
+        </div>
+      `).join('')}` : ''}
+    </div>
+  `;
+}
+
+function renderVerdictSection(v, c) {
+  const cp = v.escrow_split?.claimant_pct || 50;
+  const rp = v.escrow_split?.respondent_pct || 50;
+  const angle = (cp / 100) * 360;
+
+  return `
+    <div class="card" style="margin-bottom:24px">
+      <h4 style="font-size:.85rem;font-weight:700;margin-bottom:20px">&#9878;&#65039; Veredicto Final</h4>
+
+      <div class="verdict-split">
+        <div class="verdict-pie" style="background:conic-gradient(var(--green) 0deg ${angle}deg, var(--red) ${angle}deg 360deg)">
+          <div style="position:absolute;inset:20px;border-radius:50%;background:var(--bg2);display:flex;align-items:center;justify-content:center;flex-direction:column">
+            <div style="font-size:1.2rem;font-weight:800;color:var(--green)">${cp}%</div>
+            <div style="font-size:.6rem;color:var(--text3)">Demandante</div>
+          </div>
+        </div>
+
+        <div class="verdict-details" style="flex:1">
+          <div class="vd-row">
+            <span>&#128994; Demandante recibe</span>
+            <span style="font-weight:700;color:var(--green)">${formatMoney(v.claimant_amount || c.escrow_amount * cp / 100)}</span>
+          </div>
+          <div class="vd-row">
+            <span>&#128308; Demandado recibe</span>
+            <span style="font-weight:700;color:var(--red)">${formatMoney(v.respondent_amount || c.escrow_amount * rp / 100)}</span>
+          </div>
+          <div class="vd-row">
+            <span>&#128197; Fecha del veredicto</span>
+            <span>${formatDate(v.rendered_at)}</span>
+          </div>
+          <div class="vd-row">
+            <span>&#127942; Ganador</span>
+            <span style="font-weight:700;color:var(--blue3)">${v.winner === 'claimant' ? 'Demandante' : 'Demandado'}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="assessment-box" style="margin-top:16px">
+        <strong style="color:var(--blue3)">Razonamiento:</strong><br>
+        ${v.reasoning || 'Sin razonamiento disponible.'}
+      </div>
+    </div>
+  `;
+}
+
+function renderTimelineSection(events) {
+  if (!events || events.length === 0) return '';
+  return `
+    <div class="card" style="margin-bottom:24px">
+      <h4 style="font-size:.85rem;font-weight:700;margin-bottom:20px">&#128197; Linea de Tiempo</h4>
+      <div class="timeline">
+        ${events.map(e => `
+          <div class="timeline-item ${e.actor === 'system' ? 'system' : ''}">
+            <div class="tl-type">${e.event_type.replace(/_/g,' ')}</div>
+            <div class="tl-desc">${e.description}</div>
+            <div class="tl-time">${formatDate(e.timestamp)}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+// --- EVIDENCE TAB ---
+function renderEvidence() {
+  return `
+    <div class="page-header">
+      <div>
+        <h2>Gestion de Evidencia</h2>
+        <p>${state.evidence.length} documento${state.evidence.length!==1?'s':''} registrados</p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:24px">
+      <h4 style="font-size:.85rem;font-weight:700;margin-bottom:16px">&#128228; Subir Nueva Evidencia</h4>
+      <div class="grid-3">
+        <div class="form-group"><label>Archivo</label><input type="file" style="padding:8px"></div>
+        <div class="form-group">
+          <label>Tipo de Evidencia</label>
+          <select>
+            <option value="document">Documento</option>
+            <option value="communication">Comunicacion</option>
+            <option value="transaction">Transaccion</option>
+            <option value="testimony">Testimonio</option>
+            <option value="expert_report">Peritaje</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Descripcion</label><input type="text" placeholder="Breve descripcion del documento..."></div>
+      </div>
+      <button class="btn btn-primary btn-sm">&#128228; Subir y Registrar Hash</button>
+    </div>
+
+    <div class="card">
+      <h4 style="font-size:.85rem;font-weight:700;margin-bottom:16px">&#128193; Documentos Registrados</h4>
+      ${state.evidence.length === 0 ? '<div class="empty-state"><div class="empty-icon">&#128193;</div><p>No hay evidencia registrada aun.</p></div>' : `
+      <table class="evidence-table">
+        <thead><tr><th>Documento</th><th>Tipo</th><th>Hash SHA-256</th><th>Caso</th><th>Fecha</th><th>Verificacion</th></tr></thead>
+        <tbody>
+        ${state.evidence.map(e => {
+          const c = state.cases.find(c => c.case_id === e.case_id);
+          return `
+          <tr>
+            <td style="font-weight:500">${e.file_name}</td>
+            <td><span class="type-badge type-${e.evidence_type}">${e.evidence_type}</span></td>
+            <td style="font-family:monospace;font-size:.72rem;color:var(--text3)">${shortHash(e.file_hash)}</td>
+            <td style="font-size:.8rem">${c ? c.title.slice(0,30)+'...' : e.case_id.slice(0,8)}</td>
+            <td style="color:var(--text2);font-size:.82rem">${formatDate(e.uploaded_at)}</td>
+            <td><span class="pill pill-resolved" style="font-size:.65rem">&#128279; On-Chain</span></td>
+          </tr>`;
+        }).join('')}
+        </tbody>
+      </table>`}
+    </div>
+  `;
+}
+
+// --- AI ANALYSIS TAB ---
+function renderAnalysis() {
+  const casesWithAnalysis = state.cases.filter(c => c.ai_analysis);
+  const casesWithout = state.cases.filter(c => !c.ai_analysis);
+
+  return `
+    <div class="page-header">
+      <div>
+        <h2>Analisis de IA</h2>
+        <p>Evaluacion inteligente de evidencia y argumentos</p>
+      </div>
+    </div>
+
+    ${casesWithAnalysis.length > 0 ? `
+    <h4 style="font-size:.85rem;font-weight:700;margin-bottom:16px;color:var(--text2)">CASOS ANALIZADOS</h4>
+    ${casesWithAnalysis.map(c => `
+      <div class="card" style="margin-bottom:16px;cursor:pointer" onclick="state.selectedAnalysisCase='${c.case_id}';render()">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-weight:600;margin-bottom:4px">${c.title}</div>
+            <div style="font-size:.78rem;color:var(--text2)">Confianza: ${Math.round((c.ai_analysis.confidence||0)*100)}% &middot; ${(c.ai_analysis.deliberation_rounds||[]).length} rondas</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            ${statusPill(c.status)}
+            <span style="color:var(--text3);font-size:1.1rem">&#8250;</span>
+          </div>
+        </div>
+      </div>
+    `).join('')}` : ''}
+
+    ${casesWithout.length > 0 ? `
+    <h4 style="font-size:.85rem;font-weight:700;margin:24px 0 16px;color:var(--text2)">PENDIENTES DE ANALISIS</h4>
+    ${casesWithout.map(c => `
+      <div class="card" style="margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-weight:600;margin-bottom:4px">${c.title}</div>
+            <div style="font-size:.78rem;color:var(--text2)">${statusPill(c.status)} &middot; ${formatDate(c.created_at)}</div>
+          </div>
+          <button class="btn btn-primary btn-sm">&#129302; Solicitar Analisis</button>
+        </div>
+      </div>
+    `).join('')}` : ''}
+  `;
+}
+
+function renderAnalysisDetail() {
+  const c = state.cases.find(c => c.case_id === state.selectedAnalysisCase);
+  if (!c || !c.ai_analysis) { state.selectedAnalysisCase = null; return renderAnalysis(); }
+  const a = c.ai_analysis;
+
+  return `
+    <div class="back-btn" onclick="state.selectedAnalysisCase=null;render()">&#8592; Volver a Analisis</div>
+    <div class="page-header">
+      <div>
+        <h2>${c.title}</h2>
+        <p>Analisis de IA detallado &middot; ${(a.deliberation_rounds||[]).length} rondas completadas</p>
+      </div>
+    </div>
+    ${renderAnalysisSection(a)}
+  `;
+}
+
+// --- ANALYTICS TAB ---
+function renderAnalytics() {
+  const an = state.analytics || {};
+  const byCat = an.cases_by_category || {};
+  const byStat = an.cases_by_status || {};
+  const total = an.total_cases || 0;
+  const catColors = { contract_breach:'var(--blue)', ip_infringement:'var(--purple)', fraud:'var(--red)', service_dispute:'var(--yellow)', other:'var(--text3)' };
+
+  // Build conic gradient for pie
+  let catEntries = Object.entries(byCat);
+  let cumPct = 0;
+  let conicParts = [];
+  const catColorValues = ['#0066ff','#9c27b0','#ef5350','#ffc107','#5c6784'];
+  catEntries.forEach(([cat, count], i) => {
+    const pct = total > 0 ? (count/total)*100 : 0;
+    const color = catColorValues[i % catColorValues.length];
+    conicParts.push(`${color} ${cumPct}% ${cumPct+pct}%`);
+    cumPct += pct;
+  });
+  const conicGrad = conicParts.length > 0 ? `conic-gradient(${conicParts.join(',')})` : 'var(--border)';
+
+  // Verdict distribution
+  const resolved = state.cases.filter(c => c.status === 'RESOLVED');
+  const claimantWins = resolved.filter(c => c.verdict?.winner === 'claimant').length;
+  const respondentWins = resolved.filter(c => c.verdict?.winner === 'respondent').length;
+  const splits = resolved.length - claimantWins - respondentWins;
+
+  // Average escrow
+  const avgEscrow = total > 0 ? state.cases.reduce((s,c) => s + (c.escrow_amount||0), 0) / total : 0;
+
+  return `
+    <div class="page-header">
+      <div>
+        <h2>Analiticas de la Plataforma</h2>
+        <p>Metricas agregadas de todos los casos de arbitraje</p>
+      </div>
+    </div>
+
+    <div class="grid-4" style="margin-bottom:28px">
+      <div class="card stat-card">
+        <div class="stat-icon">&#128202;</div>
+        <div class="stat-value">${total}</div>
+        <div class="stat-label">Total de Casos</div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-icon">&#9203;</div>
+        <div class="stat-value">${an.resolution_rate_pct || 0}%</div>
+        <div class="stat-label">Tasa de Resolucion</div>
+      </div>
+      <div class="card stat-card highlight">
+        <div class="stat-icon">&#128176;</div>
+        <div class="stat-value">${formatMoney(avgEscrow)}</div>
+        <div class="stat-label">Escrow Promedio</div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-icon">&#128176;</div>
+        <div class="stat-value">${formatMoney(an.total_escrow_value || 0)}</div>
+        <div class="stat-label">Valor Total</div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:24px">
+      <div class="card">
+        <h4 style="font-size:.85rem;font-weight:700;margin-bottom:20px">&#128200; Casos por Categoria</h4>
+        <div style="display:flex;align-items:center;gap:32px">
+          <div class="pie-chart" style="background:${conicGrad}">
+            <div style="position:absolute;inset:35px;border-radius:50%;background:var(--bg2)"></div>
+          </div>
+          <div class="pie-legend">
+            ${catEntries.map(([cat, count], i) => `
+              <div class="pie-legend-item">
+                <div class="dot" style="background:${catColorValues[i % catColorValues.length]}"></div>
+                <span>${categoryLabel(cat)}: <strong>${count}</strong> (${total>0?Math.round(count/total*100):0}%)</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h4 style="font-size:.85rem;font-weight:700;margin-bottom:20px">&#9878;&#65039; Distribucion de Veredictos</h4>
+        ${resolved.length === 0 ? '<div class="empty-state" style="padding:20px"><p>Aun no hay casos resueltos suficientes.</p></div>' : `
+        <div style="display:flex;align-items:center;gap:32px">
+          <div class="pie-chart" style="background:conic-gradient(var(--green) 0% ${claimantWins/Math.max(resolved.length,1)*100}%, var(--red) ${claimantWins/Math.max(resolved.length,1)*100}% ${(claimantWins+respondentWins)/Math.max(resolved.length,1)*100}%, var(--yellow) ${(claimantWins+respondentWins)/Math.max(resolved.length,1)*100}% 100%)">
+            <div style="position:absolute;inset:35px;border-radius:50%;background:var(--bg2)"></div>
+          </div>
+          <div class="pie-legend">
+            <div class="pie-legend-item"><div class="dot" style="background:var(--green)"></div><span>Demandante gana: <strong>${claimantWins}</strong></span></div>
+            <div class="pie-legend-item"><div class="dot" style="background:var(--red)"></div><span>Demandado gana: <strong>${respondentWins}</strong></span></div>
+            <div class="pie-legend-item"><div class="dot" style="background:var(--yellow)"></div><span>Division: <strong>${splits}</strong></span></div>
+          </div>
+        </div>`}
+      </div>
+    </div>
+
+    <div class="card">
+      <h4 style="font-size:.85rem;font-weight:700;margin-bottom:20px">&#128200; Estado de Casos</h4>
+      <div style="display:flex;gap:16px;flex-wrap:wrap">
+        ${Object.entries(byStat).map(([s, count]) => `
+          <div style="flex:1;min-width:120px;text-align:center;padding:16px;background:var(--bg);border-radius:var(--radius-sm)">
+            <div style="font-size:1.6rem;font-weight:800">${count}</div>
+            <div style="margin-top:6px">${statusPill(s)}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+// --- PROFILE TAB ---
+function renderProfile() {
+  const user = state.users[0] || {};
+  const userCases = state.cases.filter(c => c.claimant_id === user.user_id);
+  const resolved = userCases.filter(c => c.status === 'RESOLVED');
+  const won = resolved.filter(c => c.verdict?.winner === 'claimant').length;
+  const totalRecovered = resolved.reduce((s,c) => s + (c.verdict?.claimant_amount || 0), 0);
+
+  return `
+    <div class="page-header"><div><h2>Perfil</h2><p>Tu perfil de arbitraje y reputacion</p></div></div>
+
+    <div class="card" style="margin-bottom:24px">
+      <div class="profile-header">
+        <div class="avatar">${(user.display_name||'U')[0]}</div>
+        <div class="profile-info">
+          <h3>${user.display_name || 'Usuario Demo'}</h3>
+          <div style="color:var(--text2);font-size:.88rem;margin-bottom:4px">${user.email || 'demo@veritas.legal'}</div>
+          <div class="wallet">${user.wallet_address || '0x...'}</div>
+          <div style="font-size:.78rem;color:var(--text3);margin-top:6px">Miembro desde ${formatDate(user.created_at)}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:24px">
+      <div class="card">
+        <h4 style="font-size:.85rem;font-weight:700;margin-bottom:20px">&#128200; Reputacion</h4>
+        <div class="gauge-container">
+          <div class="gauge">
+            <svg width="140" height="140" viewBox="0 0 140 140">
+              <circle class="gauge-bg" cx="70" cy="70" r="60"/>
+              <circle class="gauge-fill" cx="70" cy="70" r="60"
+                stroke="var(--green)"
+                stroke-dasharray="${2*Math.PI*60}"
+                stroke-dashoffset="${2*Math.PI*60*(1-1847/2500)}"/>
+            </svg>
+            <div class="gauge-text">
+              <div class="gval">1,847</div>
+              <div class="glabel">Puntuacion</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h4 style="font-size:.85rem;font-weight:700;margin-bottom:20px">&#128202; Estadisticas</h4>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div style="text-align:center;padding:16px;background:var(--bg);border-radius:var(--radius-sm)">
+            <div style="font-size:1.6rem;font-weight:800;color:var(--blue3)">${userCases.length}</div>
+            <div style="font-size:.72rem;color:var(--text3);text-transform:uppercase;margin-top:4px">Casos Presentados</div>
+          </div>
+          <div style="text-align:center;padding:16px;background:var(--bg);border-radius:var(--radius-sm)">
+            <div style="font-size:1.6rem;font-weight:800;color:var(--green)">${won}</div>
+            <div style="font-size:.72rem;color:var(--text3);text-transform:uppercase;margin-top:4px">Casos Ganados</div>
+          </div>
+          <div style="text-align:center;padding:16px;background:var(--bg);border-radius:var(--radius-sm)">
+            <div style="font-size:1.6rem;font-weight:800;color:var(--text)">${resolved.length > 0 ? Math.round(won/resolved.length*100) : 0}%</div>
+            <div style="font-size:.72rem;color:var(--text3);text-transform:uppercase;margin-top:4px">Win Rate</div>
+          </div>
+          <div style="text-align:center;padding:16px;background:var(--bg);border-radius:var(--radius-sm)">
+            <div style="font-size:1.6rem;font-weight:800;color:var(--green)">${formatMoney(totalRecovered)}</div>
+            <div style="font-size:.72rem;color:var(--text3);text-transform:uppercase;margin-top:4px">Valor Recuperado</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h4 style="font-size:.85rem;font-weight:700;margin-bottom:16px">&#128197; Historial de Casos</h4>
+      ${userCases.length === 0 ? '<div class="empty-state"><p>No hay casos en tu historial.</p></div>' :
+        userCases.map(c => renderCaseCard(c)).join('')}
+    </div>
+  `;
+}
+
+// --- EVENTS ---
+function bindEvents() {
+  // Case cards
+  document.querySelectorAll('.case-card[data-case-id]').forEach(el => {
+    el.addEventListener('click', async () => {
+      const caseId = el.dataset.caseId;
+      const c = state.cases.find(c => c.case_id === caseId);
+      if (!c) return;
+      // Load timeline
+      const tlData = await fetchJSON(`${API}/cases/${caseId}/timeline`);
+      c._timeline = tlData?.events || [];
+      state.selectedCase = c;
+      state.currentTab = 'cases';
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.querySelector('.nav-item[data-tab="cases"]').classList.add('active');
+      render();
+    });
+  });
+
+  // Filter tabs
+  document.querySelectorAll('.tab-bar .tab-btn[data-filter]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-bar .tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const filter = btn.dataset.filter;
+      const list = document.getElementById('cases-list');
+      if (!list) return;
+      const filtered = filter === 'all' ? state.cases : state.cases.filter(c => c.status === filter);
+      list.innerHTML = filtered.length === 0
+        ? '<div class="empty-state"><div class="empty-icon">&#128194;</div><p>No hay casos con ese estado.</p></div>'
+        : filtered.map(c => renderCaseCard(c)).join('');
+      // Rebind case cards
+      bindEvents();
+    });
+  });
+}
+
+// --- MODAL ---
+function openModal() {
+  document.getElementById('modal-overlay').classList.add('active');
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('active');
+}
+
+document.getElementById('modal-overlay').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeModal();
+});
+
+async function submitCase() {
+  const title = document.getElementById('case-title').value.trim();
+  const respondent = document.getElementById('case-respondent').value.trim();
+  const amount = parseInt(document.getElementById('case-amount').value) || 0;
+  const description = document.getElementById('case-description').value.trim();
+  const category = document.getElementById('case-category').value;
+
+  if (!title || !description) {
+    showToast('Complete todos los campos requeridos.');
+    return;
+  }
+
+  try {
+    const resp = await fetch(`${API}/cases`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title,
+        respondent_address: respondent || '0x0000000000000000000000000000000000000000',
+        escrow_amount: amount,
+        filing_fee: Math.max(100, Math.round(amount * 0.02)),
+        description,
+        category,
+      }),
+    });
+
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const newCase = await resp.json();
+    state.cases.unshift(newCase);
+    closeModal();
+    showToast('Caso presentado exitosamente.');
+
+    // Clear form
+    document.getElementById('case-title').value = '';
+    document.getElementById('case-respondent').value = '';
+    document.getElementById('case-amount').value = '';
+    document.getElementById('case-description').value = '';
+
+    render();
+  } catch (e) {
+    showToast('Error al presentar el caso. Intente de nuevo.');
+    console.error(e);
+  }
+}
+
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3500);
+}
+
+// --- INIT ---
+(async () => {
+  await loadData();
+  render();
+})();
+</script>
+</body>
+</html>
